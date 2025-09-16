@@ -7,7 +7,7 @@ use horned_owl::{
     ontology::set::SetOntology,
 };
 use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
-use rkyv::{rancor::Error, deserialize};
+use rkyv::{rancor::Error};
 
 
 fn main() {
