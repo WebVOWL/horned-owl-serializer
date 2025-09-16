@@ -7,6 +7,8 @@ use horned_owl::{
     ontology::set::SetOntology,
 };
 use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
+use rkyv::{rancor::Error, deserialize};
+
 
 fn main() {
     println!("Hello, world!");
@@ -30,7 +32,13 @@ pub fn parse(path: &Path, parser_config: ParserConfiguration) {
         }
         horned_owl::io::ParserOutput::RDFParser(ont, inc) => {
             let so: SetOntology<_> = ont.into();
-            println!("Ontology:\n{so:#?}");
+            let _bytes = rkyv::to_bytes::<Error>(&so).unwrap();
+            //let archived = rkyv::access::<ArchivedTest, Error>(&bytes[..]).unwrap();
+            //assert_eq!(archived, &value);
+            //let deserialized = deserialize::<Test, Error>(archived).unwrap();
+            //assert_eq!(deserialized, value);
+
+            println!("Ontology:\n{so:#?}"); 
             println!("Incomplete Parse:\n{inc:#?}");
         }
     }
