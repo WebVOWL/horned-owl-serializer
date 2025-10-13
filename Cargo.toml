@@ -4,5 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-horned-owl = {git= "https://github.com/WebVOWL/horned-owl.git"}
+horned-owl = {git="https://github.com/WebVOWL/horned-owl.git"}
 rkyv = "0.8.11"
+rdf-fusion = "0.1.0"
+tokio = "1.47.1"
+anyhow = "1.0.100"
+datafusion = "50.1.0"
+futures = "0.3.31"
