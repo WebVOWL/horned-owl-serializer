@@ -1,45 +1,91 @@
 mod remote_types;
 
+use anyhow::Result;
 use horned_owl::{
     error::HornedError,
     io::{ParserConfiguration, ParserOutput, RDFParserConfiguration, ResourceType},
-    model::{Build, RcAnnotatedComponent, RcStr},
-    ontology::set::SetOntology,
+    model::{Build, ForIRI, RcAnnotatedComponent, RcStr},
+    ontology::{component_mapped::{ComponentMappedOntology, RcComponentMappedOntology}, indexed::ForIndex, set::SetOntology},
 };
-use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
-use rkyv::{rancor::Error};
+use datafusion::{prelude::SessionConfig};
+use rdf_fusion::{io::{RdfFormat, RdfParser, RdfSyntaxError}, model::Quad, storage::memory::{MemObjectIdMapping, MemQuadStorage}};
+use std::{fs::File, io::{BufReader, BufWriter, Write}, path::Path, rc::Rc, sync::Arc};
+// use rkyv::{rancor::Error}; // Commented out since not currently used
+use rdf_fusion::store::Store;
+use futures::StreamExt;
 
-
-fn main() {
+#[tokio::main]
+pub async fn main() -> Result<(), anyhow::Error>{
     println!("Hello, world!");
+    let storage = Store::default();
     let parser_config = ParserConfiguration {
         rdf: RDFParserConfiguration::default(),
         ..Default::default()
     };
-    parse(Path::new("envo.owl"), parser_config);
+    let quads = parse(Path::new("and-complex.owl"), parser_config);
+    //println!("Quads: {:?}", quads);
+    let clean = quads.unwrap_or_else(|_| Vec::new());
+    storage.extend(clean).await?;
+    println!("Storage: {}", storage.len().await?);
+    let mut stream: rdf_fusion::execution::results::QuadStream = storage.stream().await?;
+    println!("Quads:");
+    while let Some(quad) = stream.next().await {
+        println!("{}", quad?);
+    }
+    Ok(())
 }
 
-pub fn parse(path: &Path, parser_config: ParserConfiguration) {
+pub fn parse(path: &Path, parser_config: ParserConfiguration) -> Result<Vec<Quad>, RdfSyntaxError> {
     let r = parse_path(path, parser_config).unwrap();
     match r {
-        horned_owl::io::ParserOutput::OFNParser(ont, map) => {
-            let hash_map: HashMap<&String, &String> = map.mappings().collect();
-            println!("Ontology:\n{ont:#?}\n\nMapping:\n{hash_map:#?}");
+        horned_owl::io::ParserOutput::OFNParser(ont, _map) => {
+            //let hash_map: HashMap<&String, &String> = map.mappings().collect();
+            print!("OFNParse");
+            let ontology_debug = format!("Ontology:\n{ont:#?}");
+            let reader = RdfParser::from_format(RdfFormat::RdfXml);
+            let quads = reader
+                .rename_blank_nodes()
+                .for_slice(ontology_debug.as_bytes())
+                .collect::<Result<Vec<Quad>, _>>();
+            return quads;
+            //println!("Ontology:\n{ont:#?}\n\nMapping:\n{hash_map:#?}");
         }
         horned_owl::io::ParserOutput::OWXParser(ont, map) => {
-            let hash_map: HashMap<&String, &String> = map.mappings().collect();
-            println!("Ontology:\n{ont:#?}\n\nMapping:\n{hash_map:#?}");
+            //let hash_map: HashMap<&String, &String> = map.mappings().collect();
+            print!("OWXParser");
+            let cmtont: RcComponentMappedOntology = ont.into();
+            let mut buff = BufWriter::new(Vec::new());
+            horned_owl::io::rdf::writer::write_raw(buff.get_mut(), &cmtont);
+            let reader = RdfParser::from_format(RdfFormat::RdfXml);
+            let quads = reader
+                .rename_blank_nodes()
+                .for_slice(&buff.get_ref())
+                .collect::<Result<Vec<Quad>, _>>();
+            return quads;
+            //println!("Ontology:\n{ont:#?}\n\nMapping:\n{hash_map:#?}");
         }
-        horned_owl::io::ParserOutput::RDFParser(ont, inc) => {
-            let so: SetOntology<_> = ont.into();
-            let _bytes = rkyv::to_bytes::<Error>(&so).unwrap();
+        horned_owl::io::ParserOutput::RDFParser(ont, _inc) => {
+            //let so: SetOntology<_> = ont.into();
+            print!("RDFParser");
+            let cmtont: RcComponentMappedOntology = ont.into();
+            let mut buff = BufWriter::new(Vec::new());
+            let clean = horned_owl::io::rdf::writer::write_raw(&mut buff, &cmtont);
+            //let mut read_buff = BufReader::new(buff);
+            let reader = RdfParser::from_format(RdfFormat::RdfXml);
+            let out = buff.into_inner().inspect(|x: &Vec<u8>| print!("{:?}", String::from_utf8(x.to_vec())));
+            let new_buff = BufWriter::new(out.unwrap());
+            
+            let quads = reader
+                .rename_blank_nodes()
+                .for_slice(&new_buff.get_ref())
+                .collect::<Result<Vec<Quad>, _>>();
+            return quads;
+            //let _bytes = rkyv::to_bytes::<Error>(&so).unwrap();
             //let archived = rkyv::access::<ArchivedTest, Error>(&bytes[..]).unwrap();
             //assert_eq!(archived, &value);
             //let deserialized = deserialize::<Test, Error>(archived).unwrap();
             //assert_eq!(deserialized, value);
 
-            println!("Ontology:\n{so:#?}"); 
-            println!("Incomplete Parse:\n{inc:#?}");
         }
     }
 }
@@ -80,6 +126,11 @@ pub fn path_type(path: &Path) -> Option<ResourceType> {
         _ => None,
     }
 }
+fn create_storage(config: &SessionConfig) -> Arc<MemQuadStorage> {
+    let mapping = Arc::new(MemObjectIdMapping::default());
+    Arc::new(MemQuadStorage::new(mapping, config.batch_size()))
+}
+
 
 
 
