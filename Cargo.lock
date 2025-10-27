@@ -1650,6 +1650,7 @@ dependencies = [
  "datafusion",
  "futures",
  "horned-owl",
+ "oxttl",
  "rdf-fusion",
  "rkyv",
  "tokio",
