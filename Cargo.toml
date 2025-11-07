@@ -2,5 +2,12 @@
 name = "horned-owl-serializer"
 version = "0.1.0"
 edition = "2024"
+include = ["horned_oxi.rs"]
 
 [dependencies]
+horned-owl = "1.2.0"
+oxigraph = {version="0.5.2", features=["rocksdb"]}
+test-generator = "^0.3"
+
+[dev-dependencies]
+test-generator = "^0.3"
