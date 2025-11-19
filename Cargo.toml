@@ -2,7 +2,6 @@
 name = "horned-owl-serializer"
 version = "0.1.0"
 edition = "2024"
-include = ["horned_oxi.rs"]
 
 [dependencies]
 horned-owl = "1.2.0"
