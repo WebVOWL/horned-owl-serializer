@@ -21,7 +21,7 @@ use crate::horned_oxi::{
 };
 
 pub struct HornedOxiStore<A> {
-    pub(crate) session: Store,
+    pub session: Store,
     phantom: PhantomData<A>,
 }
 impl<A: ForIRI> HornedOxiStore<A> {
