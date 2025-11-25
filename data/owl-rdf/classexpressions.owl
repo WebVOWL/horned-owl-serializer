@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.example.com/iri#"
+     xml:base="http://www.example.com/iri"
+     xmlns:o="http://www.example.com/iri#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.example.com/iri">
+        <owl:versionIRI rdf:resource="http://www.example.com/viri"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.example.com/iri#r -->
+
+    <owl:ObjectProperty rdf:about="http://www.example.com/iri#r"/>
+    
+
+
+    <!-- http://www.example.com/iri#s -->
+
+    <owl:ObjectProperty rdf:about="http://www.example.com/iri#s"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.example.com/iri#NestedClass -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#NestedClass">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.example.com/iri#A"/>
+                            <owl:Class>
+                                <owl:complementOf rdf:resource="http://www.example.com/iri#B"/>
+                            </owl:Class>
+                        </owl:unionOf>
+                    </owl:Class>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.example.com/iri#r"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://www.example.com/iri#C"/>
+                                    <owl:Class>
+                                        <owl:unionOf rdf:parseType="Collection">
+                                            <rdf:Description rdf:about="http://www.example.com/iri#D"/>
+                                            <owl:Class>
+                                                <owl:intersectionOf rdf:parseType="Collection">
+                                                    <rdf:Description rdf:about="http://www.example.com/iri#E"/>
+                                                    <owl:Class>
+                                                        <owl:complementOf rdf:resource="http://www.example.com/iri#F"/>
+                                                    </owl:Class>
+                                                </owl:intersectionOf>
+                                            </owl:Class>
+                                        </owl:unionOf>
+                                    </owl:Class>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.example.com/iri#s"/>
+                        <owl:allValuesFrom>
+                            <owl:Class>
+                                <owl:unionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="http://www.example.com/iri#G"/>
+                                    <owl:Class>
+                                        <owl:intersectionOf rdf:parseType="Collection">
+                                            <rdf:Description rdf:about="http://www.example.com/iri#H"/>
+                                            <owl:Class>
+                                                <owl:complementOf rdf:resource="http://www.example.com/iri#I"/>
+                                            </owl:Class>
+                                        </owl:intersectionOf>
+                                    </owl:Class>
+                                </owl:unionOf>
+                            </owl:Class>
+                        </owl:allValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.example.com/iri#A -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#A"/>
+    
+
+
+    <!-- http://www.example.com/iri#B -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#B"/>
+    
+
+
+    <!-- http://www.example.com/iri#C -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#C"/>
+    
+
+
+    <!-- http://www.example.com/iri#D -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#D"/>
+    
+
+
+    <!-- http://www.example.com/iri#E -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#E"/>
+    
+
+
+    <!-- http://www.example.com/iri#F -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#F"/>
+    
+
+
+    <!-- http://www.example.com/iri#G -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#G"/>
+    
+
+
+    <!-- http://www.example.com/iri#H -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#H"/>
+    
+
+
+    <!-- http://www.example.com/iri#I -->
+
+    <owl:Class rdf:about="http://www.example.com/iri#I"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.26) https://github.com/owlcs/owlapi -->
+
+
