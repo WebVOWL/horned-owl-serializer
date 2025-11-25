@@ -1,8 +1,24 @@
-use std::{fs::File, io::{BufReader, Cursor}, marker::PhantomData, path::Path};
-use horned_owl::{io::{rdf::reader::ConcreteRDFOntology, *}, model::{ForIRI, RcAnnotatedComponent, RcStr}, ontology::{component_mapped::RcComponentMappedOntology, set::SetOntology}};
-use oxigraph::{io::{JsonLdProfileSet, RdfFormat, RdfParser, RdfSerializer}, model::{NamedNode, NamedNodeRef}, store::Store};
+use horned_owl::{
+    io::{rdf::reader::ConcreteRDFOntology, *},
+    model::{ForIRI, RcAnnotatedComponent, RcStr},
+    ontology::{component_mapped::RcComponentMappedOntology, set::SetOntology},
+};
+use oxigraph::{
+    io::{JsonLdProfileSet, RdfFormat, RdfParser, RdfSerializer},
+    model::{NamedNode, NamedNodeRef, Triple},
+    store::Store,
+};
+use std::{
+    fs::File,
+    io::{BufReader, Cursor},
+    marker::PhantomData,
+    path::Path,
+};
 
-use crate::horned_oxi::{errors::{HornedOxiError, HornedOxiErrorKind}, horned_oxi::HornedVOWLExtract};
+use crate::horned_oxi::{
+    errors::{HornedOxiError, HornedOxiErrorKind},
+    horned_oxi::HornedVOWLExtract,
+};
 
 mod horned_oxi;
 
@@ -10,42 +26,63 @@ pub fn main() {
     //let session = Store::open("oxigraph.db").unwrap();
     let session = Store::new().unwrap();
     println!("Loaded {} quads", session.len().unwrap());
-    let path = Path::new("data/owl-rdf/wine.owl");
-    let _horned_oxi = HornedOxi::<RcStr>::new(session);
-    _horned_oxi.insert_file(&path, false).expect("Error inserting file");
-    println!("Loaded {} quads", _horned_oxi.session.len().unwrap());
-    let ontology = _horned_oxi.get_ontology(format!("file:://{}", path.display().to_string())).unwrap();
-    let horned_oxi = _horned_oxi.convert_ontology(ontology).unwrap();
-    println!("{}", horned_oxi);
+    let path = Path::new("data/owl-rdf/owl1-compatible.owl");
+    let horned_oxi = HornedOxi::<RcStr>::new(session);
+    horned_oxi
+        .insert_file(&path, false)
+        .expect("Error inserting file");
+    println!("Loaded {} quads", horned_oxi.session.len().unwrap());
+    let ontology = horned_oxi
+        .get_ontology(format!("file:://{}", path.display().to_string()))
+        .unwrap();
+    let horned_oxi_extract = horned_oxi.convert_ontology(ontology).unwrap();
+    println!("{:#?}", horned_oxi_extract);
+    /*
+    let results = horned_oxi.session.quads_for_pattern(
+        None,
+        None,
+        None,
+        None).collect::<Result<Vec<_>, _>>().unwrap();
+    for quad in results {
+        let triple: Triple = quad.into();
+        println!("{}", triple.to_string());
+    }
+    */
 }
 
 struct HornedOxi<A> {
     session: Store,
-    phantom: PhantomData<A>
+    phantom: PhantomData<A>,
 }
 impl<A: ForIRI> HornedOxi<A> {
     pub fn new(session: Store) -> Self {
-        Self { session, phantom: PhantomData }
+        Self {
+            session,
+            phantom: PhantomData,
+        }
     }
 
     // TTL format -> (oxittl) RDF XML quads -> (horned_owl) Normalize OWL/RDF -> Quads -> Insert into Oxigraph
     pub fn insert_file(&self, fs: &Path, lenient: bool) -> Result<(), HornedOxiError> {
-        let parser = parser_from_format(fs, lenient)?;  
+        let parser = parser_from_format(fs, lenient)?;
         let mut b_loader = self.session.bulk_loader();
         b_loader.parallel_load_from_slice(parser.parser, parser.input.as_slice())?;
-        b_loader.commit()?;  
-        
+        b_loader.commit()?;
+
         Ok(())
     }
 
     pub fn get_ontology(&self, ontology_id: String) -> Result<SetOntology<RcStr>, HornedOxiError> {
-        let quads = self.session.quads_for_pattern(
-            None, 
-            None, 
-            None, 
-            Some(NamedNodeRef::new(&ontology_id)?.into()))
+        let quads = self
+            .session
+            .quads_for_pattern(
+                None,
+                None,
+                None,
+                Some(NamedNodeRef::new(&ontology_id)?.into()),
+            )
             .collect::<Result<Vec<_>, _>>()?;
-        
+
         let mut buf = Vec::new();
         let mut serializer = RdfSerializer::from_format(RdfFormat::RdfXml).for_writer(&mut buf);
         for quad in quads {
@@ -58,7 +95,10 @@ impl<A: ForIRI> HornedOxi<A> {
         Ok(ontology.0.into())
     }
 
-    pub fn convert_ontology(&self, ontology: SetOntology<RcStr>) -> Result<HornedVOWLExtract<RcStr>, HornedOxiError> {
+    pub fn convert_ontology(
+        &self,
+        ontology: SetOntology<RcStr>,
+    ) -> Result<HornedVOWLExtract<RcStr>, HornedOxiError> {
         //let cmpontology = RcComponentMappedOntology::from(ontology);
         let horned_oxi: HornedVOWLExtract<RcStr> = ontology.into();
         //println!("{}", horned_oxi);
@@ -75,7 +115,7 @@ pub enum ResourceType {
     NQuads,
     TriG,
     JsonLd,
-    N3
+    N3,
 }
 pub enum ParserInput {
     File(Vec<u8>),
@@ -84,8 +124,8 @@ pub enum ParserInput {
 impl ParserInput {
     fn from_path(path: &Path) -> Result<Self, HornedOxiError> {
         std::fs::read(path)
-        .map(ParserInput::File)
-        .map_err(HornedOxiError::from)
+            .map(ParserInput::File)
+            .map_err(HornedOxiError::from)
     }
 
     fn as_slice(&self) -> &[u8] {
@@ -118,7 +158,7 @@ pub fn path_type(path: &Path) -> Option<ResourceType> {
 pub fn parser_from_format(path: &Path, lenient: bool) -> Result<PreparedParser, HornedOxiError> {
     let make_parser = |fmt| {
         let path_str = path.to_str().unwrap();
-        let parser = RdfParser::from_format(fmt) 
+        let parser = RdfParser::from_format(fmt)
             .with_default_graph(NamedNode::new(format!("file:://{}", path_str)).unwrap());
         if lenient { parser.lenient() } else { parser }
     };
@@ -127,12 +167,9 @@ pub fn parser_from_format(path: &Path, lenient: bool) -> Result<PreparedParser, 
         Some(ResourceType::OFN) => {
             let file = File::open(path)?;
             let mut reader = BufReader::new(file);
-            let (ont, _)
-            : (RcComponentMappedOntology, _) = ofn::reader::read(
-                &mut reader,
-                ParserConfiguration::default(),
-            )?;
-            
+            let (ont, _): (RcComponentMappedOntology, _) =
+                ofn::reader::read(&mut reader, ParserConfiguration::default())?;
+
             let mut buf = Vec::new();
             rdf::writer::write(&mut buf, &ont)?;
             Ok(PreparedParser {
@@ -143,10 +180,11 @@ pub fn parser_from_format(path: &Path, lenient: bool) -> Result<PreparedParser, 
         Some(ResourceType::OWX) => {
             let file = File::open(path)?;
             let mut reader = BufReader::new(file);
-            let ontology = owx::reader::read::<RcStr, ConcreteRDFOntology<RcStr, RcAnnotatedComponent>, _>(
-                &mut reader,
-                ParserConfiguration::default(),
-            )?;
+            let ontology = owx::reader::read::<
+                RcStr,
+                ConcreteRDFOntology<RcStr, RcAnnotatedComponent>,
+                _,
+            >(&mut reader, ParserConfiguration::default())?;
 
             let mut buf = Vec::new();
             rdf::writer::write(&mut buf, &ontology.0.into())?;
@@ -162,54 +200,55 @@ pub fn parser_from_format(path: &Path, lenient: bool) -> Result<PreparedParser, 
                 parser: make_parser(RdfFormat::Turtle),
                 input,
             })
-        },
+        }
         Some(ResourceType::NTriples) => {
             let input = ParserInput::from_path(path)?;
             Ok(PreparedParser {
                 parser: make_parser(RdfFormat::NTriples),
                 input,
             })
-        },
+        }
         Some(ResourceType::NQuads) => {
             let input = ParserInput::from_path(path)?;
             Ok(PreparedParser {
                 parser: make_parser(RdfFormat::NQuads),
                 input,
             })
-        },
+        }
         Some(ResourceType::TriG) => {
             let input = ParserInput::from_path(path)?;
             Ok(PreparedParser {
                 parser: make_parser(RdfFormat::TriG),
                 input,
             })
-        },
+        }
         Some(ResourceType::JsonLd) => {
             let input = ParserInput::from_path(path)?;
-            Ok( PreparedParser {
-                parser: make_parser(RdfFormat::JsonLd { profile: JsonLdProfileSet::default() }),
+            Ok(PreparedParser {
+                parser: make_parser(RdfFormat::JsonLd {
+                    profile: JsonLdProfileSet::default(),
+                }),
                 input,
             })
-        },
+        }
         Some(ResourceType::N3) => {
             let input = ParserInput::from_path(path)?;
             Ok(PreparedParser {
                 parser: make_parser(RdfFormat::N3),
                 input,
             })
-        },
+        }
         Some(ResourceType::OWL) => {
             let input = ParserInput::from_path(path)?;
             Ok(PreparedParser {
                 parser: make_parser(RdfFormat::RdfXml),
                 input,
             })
-        },
-        _ => {
-            Err(HornedOxiErrorKind::InvalidInput(
-                format!("Unsupported parser: {}", path.display()),
-            ))
         }
+        _ => Err(HornedOxiErrorKind::InvalidInput(format!(
+            "Unsupported parser: {}",
+            path.display()
+        ))),
     };
     Ok(prepared?)
 }
@@ -225,7 +264,12 @@ mod test {
         let session = Store::new().unwrap();
         let parser = parser_from_format(Path::new(&resource), false).unwrap();
         let _ = session.load_from_slice(parser.parser, parser.input.as_slice());
-        assert_ne!(session.len().unwrap(), 0, "Expected non-zero quads for: {}", resource);
+        assert_ne!(
+            session.len().unwrap(),
+            0,
+            "Expected non-zero quads for: {}",
+            resource
+        );
     }
     #[test_resources("data/owl-rdf/*.owl")]
     fn test_owl_parser(resource: &str) {
@@ -233,7 +277,12 @@ mod test {
         let session = Store::new().unwrap();
         let parser = parser_from_format(Path::new(&resource), false).unwrap();
         let _ = session.load_from_slice(parser.parser, parser.input.as_slice());
-        assert_ne!(session.len().unwrap(), 0, "Expected non-zero quads for: {}", resource);
+        assert_ne!(
+            session.len().unwrap(),
+            0,
+            "Expected non-zero quads for: {}",
+            resource
+        );
     }
     #[test_resources("data/owl-ttl/*.ttl")]
     fn test_ttl_parser(resource: &str) {
@@ -241,7 +290,12 @@ mod test {
         let session = Store::new().unwrap();
         let parser = parser_from_format(Path::new(&resource), false).unwrap();
         let _ = session.load_from_slice(parser.parser, parser.input.as_slice());
-        assert_ne!(session.len().unwrap(), 0, "Expected non-zero quads for: {}", resource);
+        assert_ne!(
+            session.len().unwrap(),
+            0,
+            "Expected non-zero quads for: {}",
+            resource
+        );
     }
 
     #[test_resources("data/owl-functional/*.ofn")]
@@ -249,7 +303,9 @@ mod test {
         use oxigraph::store::Store;
         let session = Store::new().unwrap();
         let parser = parser_from_format(Path::new(&resource), false).unwrap();
-        session.load_from_slice(parser.parser, parser.input.as_slice()).unwrap();
+        session
+            .load_from_slice(parser.parser, parser.input.as_slice())
+            .unwrap();
         let quads1size = session.len().unwrap();
         let quads1 = session.iter().collect::<Result<Vec<_>, _>>().unwrap();
         assert_ne!(quads1size, 0, "Expected non-zero quads for: {}", resource);
@@ -259,11 +315,18 @@ mod test {
             let repl = resource.replace("owl-functional", foldr);
             let path = Path::new(&repl).with_extension(ext);
             let parser = parser_from_format(&path, false).unwrap();
-            session.load_from_slice(parser.parser, parser.input.as_slice()).unwrap();
-        
+            session
+                .load_from_slice(parser.parser, parser.input.as_slice())
+                .unwrap();
+
             let quads2size = session.len().unwrap();
             let quads2 = session.iter().collect::<Result<Vec<_>, _>>().unwrap();
-            assert_ne!(quads2size, 0, "Expected non-zero quads for: {}", path.display());
+            assert_ne!(
+                quads2size,
+                0,
+                "Expected non-zero quads for: {}",
+                path.display()
+            );
             assert_eq!(
                 quads1size,
                 quads2size,
@@ -275,7 +338,7 @@ mod test {
             session.clear().unwrap();
         }
     }
-    
+
     fn pretty_print_quads(
         quads1: &[oxigraph::model::Quad],
         quads2: &[oxigraph::model::Quad],
