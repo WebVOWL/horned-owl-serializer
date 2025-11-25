@@ -1,3 +1,5 @@
 /target
 /oxigraph*
 data/tertiary/latest-lexemes.ttl
+data/owl-rdf/wine.owl
+data/tertiary/infobox.ttl
