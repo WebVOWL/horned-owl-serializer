@@ -129,6 +129,7 @@ pub fn path_type(path: &Path) -> Option<ResourceType> {
 pub fn parser_from_format(path: &Path, lenient: bool) -> Result<PreparedParser, HornedOxiError> {
     let make_parser = |fmt| {
         let path_str = path.to_str().unwrap();
+        // TODO: Handle non default graph
         let parser = RdfParser::from_format(fmt)
             .with_default_graph(NamedNode::new(format!("file:://{}", path_str)).unwrap());
         if lenient { parser.lenient() } else { parser }
