@@ -1,101 +1,214 @@
-#[allow(dead_code)]
-use std::{collections::HashMap, fmt};
-use horned_owl::{model::{ClassExpression, DeclareClass, EquivalentClasses, ForIRI}, 
-    ontology::set::SetOntology};
-use crate::horned_oxi::horned_oxi_visitor::{Visit, Walk};
+use crate::horned_oxi::horned_oxi_visitor::{ForVisit, Visit, Walk};
+use horned_owl::{
+    model::{ClassExpression, DeclareClass, EquivalentClasses, ForIRI, IRI, Individual},
+    ontology::set::SetOntology,
+};
+use std::{collections::HashMap, fmt, ops::Deref};
 
-#[derive(Debug)]
-pub enum NodeType {
-    Class(u32),
-    ExternalClass(u32),
-    Thing(u32),
-    EquivalentClass(Vec<u32>),
-    Union(u32),
-    DisjointUnion(u32),
-    Intersection(u32),
-    Complement(u32),
-    DeprecatedClass(u32),
-    AnonymousClass(u32),
-    Literal(u32),
-    RdfsClass(u32),
-    RdfsResource(u32),
+#[derive(Clone)]
+pub struct Kind<T>(pub Thing<T>);
+
+#[derive(Debug, Clone)]
+pub enum Thing<T> {
+    Node(Node<T>),
+    Edge(Edge<T>),
 }
-pub enum EdgeTo {
-    Node(u32),
-    Edge(u32),
+
+#[derive(Debug, Clone)]
+pub enum Node<T> {
+    Class(T),
+    ExternalClass(T),
+    Thing(T),
+    EquivalentClass(Vec<T>),
+    Union(T),
+    DisjointUnion(T),
+    Intersection(T),
+    Complement(T),
+    DeprecatedClass(T),
+    AnonymousClass(T),
+    Literal(T),
+    RdfsClass(T),
+    RdfsResource(T),
 }
-pub enum EdgeType {
-    Datatype(EdgeTo, EdgeTo),
-    ObjectProperty(EdgeTo, EdgeTo),
-    DatatypeProperty(EdgeTo, EdgeTo),
-    SubclassOf(EdgeTo, EdgeTo),
-    InverseProperty(EdgeTo, EdgeTo),
-    DisjointWith(EdgeTo, EdgeTo),
-    RdfProperty(EdgeTo, EdgeTo),
-    DeprecatedProperty(EdgeTo, EdgeTo),
-    ExternalProperty(EdgeTo, EdgeTo),
-    ValuesFrom(EdgeTo, EdgeTo),
+
+impl From<Node<u32>> for Thing<u32> {
+    fn from(node: Node<u32>) -> Self {
+        Thing::Node(node)
+    }
+}
+
+impl From<Edge<u32>> for Thing<u32> {
+    fn from(edge: Edge<u32>) -> Self {
+        Thing::Edge(edge)
+    }
+}
+
+
+
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub enum Edge<T> {
+    Datatype(T, T),
+    ObjectProperty(T,T, T),
+    DatatypeProperty(T, T),
+    SubclassOf(T, T),
+    InverseProperty(T, T),
+    DisjointWith(T, T),
+    RdfProperty(T, T),
+    DeprecatedProperty(T, T),
+    ExternalProperty(T, T),
+    ValuesFrom(T, T),
     NoDraw,
 }
 
+impl<T: Clone> ForVisit<Thing<T>> for Kind<T> {
+    fn inner(&self) -> Thing<T> {
+        self.0.clone()
+    }
+}
+#[derive(Debug)]
 pub struct HornedVOWLExtract<A> {
     //ontology: ComponentMappedOntology<A, Rc<AnnotatedComponent<A>>>,
-    nodes: Vec<NodeType>,
+    nodes: Vec<Node<u32>>,
     // [from, edge_type, to]
-    edges: Vec<[u8; 3]>,
-    index: HashMap<A, u32>,
+    edges: Vec<Edge<u32>>,
+    iricache: HashMap<A, (u32, Option<u32>)>,
+    domain: HashMap<A, Vec<A>>,
+    range: HashMap<A, Vec<A>>,
 }
 
 impl<A> Default for HornedVOWLExtract<A> {
     fn default() -> Self {
-        Self { nodes: vec![], edges: vec![], index: HashMap::new() }
+        Self {
+            nodes: vec![],
+            edges: vec![],
+            iricache: HashMap::new(),
+            domain: HashMap::new(),
+            range: HashMap::new(),
+        }
     }
 }
 
-impl<A: ForIRI> HornedVOWLExtract<A> {   
-    
-    pub fn get_insert(&mut self, x: A)  -> u32 {
-        if !self.index.contains_key(&x) {
-            self.index.insert(x.clone(), self.index.len() as u32);
+impl<A: ForIRI> HornedVOWLExtract<A> {
+    pub fn insert(&mut self, x: A) -> (bool, u32) {
+        let present = self.iricache.contains_key(&x);
+        if !present {
+            self.iricache
+                .insert(x.clone(), (self.iricache.len() as u32, None));
         }
-        self.index[&x]
+        (present, self.iricache[&x].0)
     }
-
 }
 
 impl<A: ForIRI> From<SetOntology<A>> for HornedVOWLExtract<A> {
     fn from(ontology: SetOntology<A>) -> Self {
-        let mut walk = Walk::new(Self::default());
-        walk.set_ontology(&ontology);
+        let mut walk = Walk::<A, u32, Self>::new(Self::default());
+        walk.set_ontology(None, &ontology);
         walk.into_visit()
     }
 }
 
-impl<A: ForIRI, B> Visit<A, B> for HornedVOWLExtract<A> {
-    fn visit_declare_class(&mut self, cmp: &DeclareClass<A>) -> Option<B> {
-        let index = self.get_insert(cmp.0.underlying());
-        self.nodes.push(NodeType::Class(index));
-        None
+impl<A: ForIRI> Visit<A, u32> for HornedVOWLExtract<A> {
+    fn visit_declare_class(
+        &mut self,
+        _: Option<Kind<u32>>,
+        cmp: &DeclareClass<A>,
+    ) -> Option<Kind<u32>> {
+        let index = self.insert(cmp.0.underlying());
+        if !index.0 {
+            self.nodes.push(Node::Class(index.1));
+        }
+        Some(Kind(Thing::Node(Node::Class(index.1))))
     }
-    fn visit_equivalent_classes(&mut self, cmp: &EquivalentClasses<A>) -> Option<B> {
+    fn visit_equivalent_classes(
+        &mut self,
+        _: Option<Kind<u32>>,
+        cmp: &EquivalentClasses<A>,
+    ) -> Option<Kind<u32>> {
+        let mut equivalent_classes = vec![];
         //let index = self.get_insert(cmp.0.underlying());
         for class in &cmp.0 {
             match class {
                 ClassExpression::Class(name) => {
-                    let index = self.get_insert(name.0.underlying());
-                    self.nodes.push(NodeType::Class(index));
-                }
-                ClassExpression::<A>::ObjectIntersectionOf(classes) => {
-                    for class in classes {
-                        let index = self.get_insert(class);
-                        self.nodes.push(NodeType::Class(index));
-                        self.visit_class_expression(class);
+                    let index = self.insert(name.0.underlying());
+                    if !index.0 {
+                        equivalent_classes.push(index.1);
                     }
                 }
                 _ => {}
             }
         }
-        None
+        if !equivalent_classes.is_empty() {
+            self.nodes.push(Node::EquivalentClass(equivalent_classes));
+            self.nodes
+                .last()
+                .cloned()
+                .map(|node| Kind(node.into()))
+        } else {
+            None
+        }
+    }
+    fn visit_named_individual(
+            &mut self,
+            _: Option<Kind<u32>>,
+            cmp: &horned_owl::model::NamedIndividual<A>,
+        ) -> Option<Kind<u32>> {
+            let index = self.insert(cmp.0.underlying());
+            if !index.0 {
+                self.nodes.push(Node::Thing(index.1));
+            }
+            Some(Kind(Thing::Node(Node::Thing(index.1))))
+    }
+    fn visit_object_property_assertion(
+        &mut self,
+        _: Option<Kind<u32>>,
+        cmp: &horned_owl::model::ObjectPropertyAssertion<A>,
+    ) -> Option<Kind<u32>> {
+        let index_ope = self.insert(cmp.ope.as_property().unwrap().0.underlying());
+        
+        let index_from = match cmp.from.clone() {
+            Individual::Named(name) => {
+                self.insert(name.0.underlying())
+            }
+            Individual::Anonymous(anonymous) => {
+                self.insert(anonymous.0)
+            }
+        };
+        let index_to = match cmp.to.clone() {
+            Individual::Named(name) => {
+                self.insert(name.0.underlying())
+            }
+            Individual::Anonymous(anonymous) => {
+                self.insert(anonymous.0)
+            }
+        };
+        self.edges.push(Edge::ObjectProperty(index_from.1, index_ope.1, index_to.1));
+        Some(Kind(Thing::Edge(Edge::ObjectProperty(index_from.1, index_ope.1, index_to.1))))
+    }
+    fn visit_sub_class_of(&mut self, _: Option<Kind<u32>>, cmp: &horned_owl::model::SubClassOf<A>) -> Option<Kind<u32>> {
+        
+        let index_sub = match &cmp.sub {
+            ClassExpression::Class(name) => {
+                Some(self.insert(name.0.underlying()))
+            }
+            _ => None
+        };
+        let index_sup = match &cmp.sup {
+            ClassExpression::Class(name) => {
+                Some(self.insert(name.0.underlying()))
+            }
+            _ => None
+        };
+        if !index_sub.is_some_and(|x| x.0) {
+            self.nodes.push(Node::Class(index_sub.unwrap().1));
+        }
+        if !index_sup.is_some_and(|x| x.0) {
+            self.nodes.push(Node::Class(index_sup.unwrap().1));
+        }
+        
+        self.edges.push(Edge::SubclassOf(index_sub.unwrap().1, index_sup.unwrap().1));
+        Some(Kind(Thing::Edge(Edge::SubclassOf(index_sub.unwrap().1, index_sup.unwrap().1))))
+        
     }
 }
 
@@ -106,7 +219,7 @@ impl<A: ForIRI> From<ComponentMappedOntology<A, Rc<AnnotatedComponent<A>>>> for 
         let mut index = HashMap::<A, u32>::new();
         let mut nodes = Vec::new();
         let mut edges = Vec::new();
-        
+
         nodes.append(ontology
             .declare_class()
             .into_iter()
@@ -124,7 +237,7 @@ impl<A: ForIRI> From<ComponentMappedOntology<A, Rc<AnnotatedComponent<A>>>> for 
         edges.append(ontology
             .object_property_assertion()
             .into_iter()
-            .map(|cmp| {    
+            .map(|cmp| {
                 let ul = cmp.ope.as_property().unwrap().0.underlying();
                 EdgeType::ObjectProperty(index[&cmp.to.clone()], index[&cmp.from.clone()])
             })
@@ -152,11 +265,11 @@ impl<A: ForIRI> From<ComponentMappedOntology<A, Rc<AnnotatedComponent<A>>>> for 
                 NodeType::EquivalentClass(ul.iter().map(|class| index[&class.clone()]).collect())
             }).collect::<Vec<NodeType>>().as_mut());
         //let nodes = ontology.index().iter().map(|cmp| cmp.kind()).collect();
-        Self { 
-            nodes, 
-            edges: vec![], 
-            index, 
-            phantom: PhantomData 
+        Self {
+            nodes,
+            edges: vec![],
+            index,
+            phantom: PhantomData
         }
     }
 }
@@ -164,8 +277,10 @@ impl<A: ForIRI> From<ComponentMappedOntology<A, Rc<AnnotatedComponent<A>>>> for 
 
 impl<A: ForIRI> fmt::Display for HornedVOWLExtract<A> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "HornedConvert {{ nodes: {:?}\nedges: {:?}\nindex: {:?} }}", self.nodes, self.edges, self.index)
+        write!(
+            f,
+            "HornedConvert {{ nodes: {:#?}\nedges: {:#?}\nindex: {:#?} }}",
+            self.nodes, self.edges, self.iricache
+        )
     }
 }
-
-
