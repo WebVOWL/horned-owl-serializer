@@ -5,297 +5,515 @@ use horned_owl::vocab::Facet;
 use std::collections::BTreeSet;
 use std::marker::PhantomData;
 
-pub trait Visit<A: ForIRI, B = ()> {
-    fn visit_string(&mut self, _: &String) -> Option<B> {
+use crate::horned_oxi::horned_oxi::Kind;
+
+pub trait ForVisit<T> {
+    fn inner(&self) -> T;
+}
+
+pub trait Visit<A: ForIRI, B> {
+    fn visit_string(&mut self, _: Option<Kind<B>>, _: &String) -> Option<Kind<B>> {
         None
     }
-    fn visit_u32(&mut self, _: &u32) -> Option<B> {
+    fn visit_u32(&mut self, _: Option<Kind<B>>, _: &u32) -> Option<Kind<B>> {
         None
     }
-    fn visit_iri(&mut self, _: &IRI<A>) -> Option<B> {
+    fn visit_iri(&mut self, _: Option<Kind<B>>, _: &IRI<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_anonymous_individual(&mut self, _: &AnonymousIndividual<A>) -> Option<B> {
+    fn visit_anonymous_individual(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnonymousIndividual<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_individual(&mut self, _: &Individual<A>) -> Option<B> {
+    fn visit_individual(&mut self, _: Option<Kind<B>>, _: &Individual<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_subject(&mut self, _: &AnnotationSubject<A>) -> Option<B> {
+    fn visit_annotation_subject(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotationSubject<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_dociri(&mut self, _: &DocIRI<A>) -> Option<B> {
+    fn visit_dociri(&mut self, _: Option<Kind<B>>, _: &DocIRI<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_class(&mut self, _: &Class<A>) -> Option<B> {
+    fn visit_class(&mut self, _: Option<Kind<B>>, _: &Class<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_datatype(&mut self, _: &Datatype<A>) -> Option<B> {
+    fn visit_datatype(&mut self, _: Option<Kind<B>>, _: &Datatype<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_object_property(&mut self, _: &ObjectProperty<A>) -> Option<B> {
+    fn visit_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_property(&mut self, _: &DataProperty<A>) -> Option<B> {
+    fn visit_data_property(&mut self, _: Option<Kind<B>>, _: &DataProperty<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_property(&mut self, _: &AnnotationProperty<A>) -> Option<B> {
+    fn visit_annotation_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotationProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_named_individual(&mut self, _: &NamedIndividual<A>) -> Option<B> {
+    fn visit_named_individual(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &NamedIndividual<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotated_component(&mut self, _: &AnnotatedComponent<A>) -> Option<B> {
+    fn visit_annotated_component(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotatedComponent<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_component(&mut self, _: &Component<A>) -> Option<B> {
+    fn visit_component(&mut self, _: Option<Kind<B>>, _: &Component<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_import(&mut self, _: &Import<A>) -> Option<B> {
+    fn visit_import(&mut self, _: Option<Kind<B>>, _: &Import<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_ontology_annotation(&mut self, _: &OntologyAnnotation<A>) -> Option<B> {
+    fn visit_ontology_annotation(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &OntologyAnnotation<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_declare_class(&mut self, _: &DeclareClass<A>) -> Option<B> {
+    fn visit_declare_class(&mut self, _: Option<Kind<B>>, _: &DeclareClass<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_declare_object_property(&mut self, _: &DeclareObjectProperty<A>) -> Option<B> {
+    fn visit_declare_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DeclareObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_declare_annotation_property(
         &mut self,
+        _: Option<Kind<B>>,
         _: &DeclareAnnotationProperty<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_declare_data_property(&mut self, _: &DeclareDataProperty<A>) -> Option<B> {
+    fn visit_declare_data_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DeclareDataProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_declare_named_individual(&mut self, _: &DeclareNamedIndividual<A>) -> Option<B> {
+    fn visit_declare_named_individual(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DeclareNamedIndividual<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_declare_datatype(&mut self, _: &DeclareDatatype<A>) -> Option<B> {
+    fn visit_declare_datatype(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DeclareDatatype<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_sub_class_of(&mut self, _: &SubClassOf<A>) -> Option<B> {
+    fn visit_sub_class_of(&mut self, _: Option<Kind<B>>, _: &SubClassOf<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_equivalent_classes(&mut self, _: &EquivalentClasses<A>) -> Option<B> {
+    fn visit_equivalent_classes(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &EquivalentClasses<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_disjoint_classes(&mut self, _: &DisjointClasses<A>) -> Option<B> {
+    fn visit_disjoint_classes(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DisjointClasses<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_disjoint_union(&mut self, _: &DisjointUnion<A>) -> Option<B> {
+    fn visit_disjoint_union(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DisjointUnion<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_sub_object_property_of(&mut self, _: &SubObjectPropertyOf<A>) -> Option<B> {
+    fn visit_sub_object_property_of(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &SubObjectPropertyOf<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_equivalent_object_properties(
         &mut self,
+        _: Option<Kind<B>>,
         _: &EquivalentObjectProperties<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_disjoint_object_properties(&mut self, _: &DisjointObjectProperties<A>) -> Option<B> {
+    fn visit_disjoint_object_properties(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DisjointObjectProperties<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_inverse_object_properties(&mut self, _: &InverseObjectProperties<A>) -> Option<B> {
+    fn visit_inverse_object_properties(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &InverseObjectProperties<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_object_property_domain(&mut self, _: &ObjectPropertyDomain<A>) -> Option<B> {
+    fn visit_object_property_domain(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ObjectPropertyDomain<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_object_property_range(&mut self, _: &ObjectPropertyRange<A>) -> Option<B> {
+    fn visit_object_property_range(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ObjectPropertyRange<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_functional_object_property(&mut self, _: &FunctionalObjectProperty<A>) -> Option<B> {
+    fn visit_functional_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &FunctionalObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_inverse_functional_object_property(
         &mut self,
+        _: Option<Kind<B>>,
         _: &InverseFunctionalObjectProperty<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_reflexive_object_property(&mut self, _: &ReflexiveObjectProperty<A>) -> Option<B> {
+    fn visit_reflexive_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ReflexiveObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_irreflexive_object_property(&mut self, _: &IrreflexiveObjectProperty<A>) -> Option<B> {
+    fn visit_irreflexive_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &IrreflexiveObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_symmetric_object_property(&mut self, _: &SymmetricObjectProperty<A>) -> Option<B> {
+    fn visit_symmetric_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &SymmetricObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_asymmetric_object_property(&mut self, _: &AsymmetricObjectProperty<A>) -> Option<B> {
+    fn visit_asymmetric_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AsymmetricObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_transitive_object_property(&mut self, _: &TransitiveObjectProperty<A>) -> Option<B> {
+    fn visit_transitive_object_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &TransitiveObjectProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_sub_data_property_of(&mut self, _: &SubDataPropertyOf<A>) -> Option<B> {
+    fn visit_sub_data_property_of(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &SubDataPropertyOf<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_equivalent_data_properties(
         &mut self,
+        _: Option<Kind<B>>,
         _: &EquivalentDataProperties<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_disjoint_data_properties(&mut self, _: &DisjointDataProperties<A>) -> Option<B> {
+    fn visit_disjoint_data_properties(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DisjointDataProperties<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_property_domain(&mut self, _: &DataPropertyDomain<A>) -> Option<B> {
+    fn visit_data_property_domain(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DataPropertyDomain<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_property_range(&mut self, _: &DataPropertyRange<A>) -> Option<B> {
+    fn visit_data_property_range(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DataPropertyRange<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_functional_data_property(&mut self, _: &FunctionalDataProperty<A>) -> Option<B> {
+    fn visit_functional_data_property(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &FunctionalDataProperty<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_datatype_definition(&mut self, _: &DatatypeDefinition<A>) -> Option<B> {
+    fn visit_datatype_definition(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DatatypeDefinition<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_has_key(&mut self, _: &HasKey<A>) -> Option<B> {
+    fn visit_has_key(&mut self, _: Option<Kind<B>>, _: &HasKey<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_same_individual(&mut self, _: &SameIndividual<A>) -> Option<B> {
+    fn visit_same_individual(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &SameIndividual<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_different_individuals(&mut self, _: &DifferentIndividuals<A>) -> Option<B> {
+    fn visit_different_individuals(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DifferentIndividuals<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_class_assertion(&mut self, _: &ClassAssertion<A>) -> Option<B> {
+    fn visit_class_assertion(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ClassAssertion<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_object_property_assertion(&mut self, _: &ObjectPropertyAssertion<A>) -> Option<B> {
+    fn visit_object_property_assertion(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ObjectPropertyAssertion<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_negative_object_property_assertion(
         &mut self,
+        _: Option<Kind<B>>,
         _: &NegativeObjectPropertyAssertion<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_property_assertion(&mut self, _: &DataPropertyAssertion<A>) -> Option<B> {
+    fn visit_data_property_assertion(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &DataPropertyAssertion<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_negative_data_property_assertion(
         &mut self,
+        _: Option<Kind<B>>,
         _: &NegativeDataPropertyAssertion<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_assertion(&mut self, _: &AnnotationAssertion<A>) -> Option<B> {
+    fn visit_annotation_assertion(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotationAssertion<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_sub_annotation_property_of(&mut self, _: &SubAnnotationPropertyOf<A>) -> Option<B> {
+    fn visit_sub_annotation_property_of(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &SubAnnotationPropertyOf<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_property_domain(&mut self, _: &AnnotationPropertyDomain<A>) -> Option<B> {
+    fn visit_annotation_property_domain(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotationPropertyDomain<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_property_range(&mut self, _: &AnnotationPropertyRange<A>) -> Option<B> {
+    fn visit_annotation_property_range(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotationPropertyRange<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_rule(&mut self, _: &Rule<A>) -> Option<B> {
+    fn visit_rule(&mut self, _: Option<Kind<B>>, _: &Rule<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_atom(&mut self, _: &Atom<A>) -> Option<B> {
+    fn visit_atom(&mut self, _: Option<Kind<B>>, _: &Atom<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_variable(&mut self, _: &Variable<A>) -> Option<B> {
+    fn visit_variable(&mut self, _: Option<Kind<B>>, _: &Variable<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_iarg(&mut self, _: &IArgument<A>) -> Option<B> {
+    fn visit_iarg(&mut self, _: Option<Kind<B>>, _: &IArgument<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_darg(&mut self, _: &DArgument<A>) -> Option<B> {
+    fn visit_darg(&mut self, _: Option<Kind<B>>, _: &DArgument<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_literal(&mut self, _: &Literal<A>) -> Option<B> {
+    fn visit_literal(&mut self, _: Option<Kind<B>>, _: &Literal<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation(&mut self, _: &Annotation<A>) -> Option<B> {
+    fn visit_annotation(&mut self, _: Option<Kind<B>>, _: &Annotation<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_value(&mut self, _: &AnnotationValue<A>) -> Option<B> {
+    fn visit_annotation_value(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &AnnotationValue<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_object_property_expression(&mut self, _: &ObjectPropertyExpression<A>) -> Option<B> {
+    fn visit_object_property_expression(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ObjectPropertyExpression<A>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_sub_object_property_expression(
         &mut self,
+        _: Option<Kind<B>>,
         _: &SubObjectPropertyExpression<A>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_property_expression(&mut self, _: &PropertyExpression<A>) -> Option<B> {
+    fn visit_property_expression(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &PropertyExpression<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_facet_restriction(&mut self, _: &FacetRestriction<A>) -> Option<B> {
+    fn visit_facet_restriction(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &FacetRestriction<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_facet(&mut self, _: &Facet) -> Option<B> {
+    fn visit_facet(&mut self, _: Option<Kind<B>>, _: &Facet) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_range(&mut self, _: &DataRange<A>) -> Option<B> {
+    fn visit_data_range(&mut self, _: Option<Kind<B>>, _: &DataRange<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_class_expression(&mut self, _: &ClassExpression<A>) -> Option<B> {
+    fn visit_class_expression(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &ClassExpression<A>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_ontology_id(&mut self, _: &OntologyID<A>) -> Option<B> {
+    fn visit_ontology_id(&mut self, _: Option<Kind<B>>, _: &OntologyID<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_set_ontology(&mut self, _: &SetOntology<A>) -> Option<B> {
+    fn visit_set_ontology(&mut self, _: Option<Kind<B>>, _: &SetOntology<A>) -> Option<Kind<B>> {
         None
     }
-    fn visit_option_iri(&mut self, _: &Option<IRI<A>>) -> Option<B> {
+    fn visit_option_iri(&mut self, _: Option<Kind<B>>, _: &Option<IRI<A>>) -> Option<Kind<B>> {
         None
     }
-    fn visit_annotation_set(&mut self, _: &BTreeSet<Annotation<A>>) -> Option<B> {
+    fn visit_annotation_set(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &BTreeSet<Annotation<A>>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_class_expression_vec(&mut self, _: &Vec<ClassExpression<A>>) -> Option<B> {
+    fn visit_class_expression_vec(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &Vec<ClassExpression<A>>,
+    ) -> Option<Kind<B>> {
         None
     }
     fn visit_object_property_expression_vec(
         &mut self,
+        _: Option<Kind<B>>,
         _: &Vec<ObjectPropertyExpression<A>>,
-    ) -> Option<B> {
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_property_vec(&mut self, _: &Vec<DataProperty<A>>) -> Option<B> {
+    fn visit_data_property_vec(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &Vec<DataProperty<A>>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_data_range_vec(&mut self, _: &Vec<DataRange<A>>) -> Option<B> {
+    fn visit_data_range_vec(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &Vec<DataRange<A>>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_individual_vec(&mut self, _: &Vec<Individual<A>>) -> Option<B> {
+    fn visit_individual_vec(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &Vec<Individual<A>>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_literal_vec(&mut self, _: &Vec<Literal<A>>) -> Option<B> {
+    fn visit_literal_vec(&mut self, _: Option<Kind<B>>, _: &Vec<Literal<A>>) -> Option<Kind<B>> {
         None
     }
-    fn visit_facet_restriction_vec(&mut self, _: &Vec<FacetRestriction<A>>) -> Option<B> {
+    fn visit_facet_restriction_vec(
+        &mut self,
+        _: Option<Kind<B>>,
+        _: &Vec<FacetRestriction<A>>,
+    ) -> Option<Kind<B>> {
         None
     }
-    fn visit_atom_vec(&mut self, _: &Vec<Atom<A>>) -> Option<B> {
+    fn visit_atom_vec(&mut self, _: Option<Kind<B>>, _: &Vec<Atom<A>>) -> Option<Kind<B>> {
         None
     }
-    fn visit_darg_vec(&mut self, _: &Vec<DArgument<A>>) -> Option<B> {
+    fn visit_darg_vec(&mut self, _: Option<Kind<B>>, _: &Vec<DArgument<A>>) -> Option<Kind<B>> {
         None
     }
 }
 
-pub struct Walk<A, V>(V, PhantomData<A>);
+pub struct Walk<A, B, V>(V, PhantomData<(A, B)>);
 
-impl<A: ForIRI, V: Visit<A>> Walk<A, V> {
+impl<A: ForIRI, B: Clone, V: Visit<A, B>> Walk<A, B, V> {
     pub fn new(v: V) -> Self {
         Walk(v, PhantomData)
     }
@@ -308,740 +526,857 @@ impl<A: ForIRI, V: Visit<A>> Walk<A, V> {
         self.0
     }
 
-    pub fn iri(&mut self, e: &IRI<A>) {
-        self.0.visit_iri(e);
+    pub fn iri(&mut self, parent: Option<Kind<B>>, e: &IRI<A>) {
+        self.0.visit_iri(parent, e);
     }
 
-    pub fn anonymous_individual(&mut self, e: &AnonymousIndividual<A>) {
-        self.0.visit_anonymous_individual(e);
+    pub fn anonymous_individual(&mut self, parent: Option<Kind<B>>, e: &AnonymousIndividual<A>) {
+        self.0.visit_anonymous_individual(parent, e);
     }
 
-    pub fn individual(&mut self, e: &Individual<A>) {
-        self.0.visit_individual(e);
+    pub fn individual(&mut self, parent: Option<Kind<B>>, e: &Individual<A>) {
+        let new_parent = self.0.visit_individual(parent, e);
         match e {
-            Individual::Anonymous(e) => self.anonymous_individual(e),
-            Individual::Named(e) => self.named_individual(e),
+            Individual::Anonymous(e) => self.anonymous_individual(new_parent, e),
+            Individual::Named(e) => self.named_individual(new_parent, e),
         }
     }
 
-    pub fn annotation_subject(&mut self, e: &AnnotationSubject<A>) {
-        self.0.visit_annotation_subject(e);
+    pub fn annotation_subject(&mut self, parent: Option<Kind<B>>, e: &AnnotationSubject<A>) {
+        let new_parent = self.0.visit_annotation_subject(parent, e);
         match e {
-            AnnotationSubject::IRI(e) => self.iri(e),
-            AnnotationSubject::AnonymousIndividual(e) => self.anonymous_individual(e),
-        }
+            AnnotationSubject::IRI(iri) => self.iri(new_parent.clone(), iri),
+            AnnotationSubject::AnonymousIndividual(anon) => {
+                self.anonymous_individual(new_parent.clone(), anon)
+            }
+        };
     }
 
-    pub fn dociri(&mut self, e: &DocIRI<A>) {
-        self.0.visit_dociri(e);
-        self.iri(&e.0);
+    pub fn dociri(&mut self, parent: Option<Kind<B>>, e: &DocIRI<A>) {
+        let new_parent = self.0.visit_dociri(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn class(&mut self, e: &Class<A>) {
-        self.0.visit_class(e);
-        self.iri(&e.0);
+    pub fn class(&mut self, parent: Option<Kind<B>>, e: &Class<A>) {
+        let new_parent = self.0.visit_class(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn datatype(&mut self, e: &Datatype<A>) {
-        self.0.visit_datatype(e);
-        self.iri(&e.0);
+    pub fn datatype(&mut self, parent: Option<Kind<B>>, e: &Datatype<A>) {
+        let new_parent = self.0.visit_datatype(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn object_property(&mut self, e: &ObjectProperty<A>) {
-        self.0.visit_object_property(e);
-        self.iri(&e.0);
+    pub fn object_property(&mut self, parent: Option<Kind<B>>, e: &ObjectProperty<A>) {
+        let new_parent = self.0.visit_object_property(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn data_property(&mut self, e: &DataProperty<A>) {
-        self.0.visit_data_property(e);
-        self.iri(&e.0);
+    pub fn data_property(&mut self, parent: Option<Kind<B>>, e: &DataProperty<A>) {
+        let new_parent = self.0.visit_data_property(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn annotation_property(&mut self, e: &AnnotationProperty<A>) {
-        self.0.visit_annotation_property(e);
-        self.iri(&e.0);
+    pub fn annotation_property(&mut self, parent: Option<Kind<B>>, e: &AnnotationProperty<A>) {
+        let new_parent = self.0.visit_annotation_property(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn named_individual(&mut self, e: &NamedIndividual<A>) {
-        self.0.visit_named_individual(e);
-        self.iri(&e.0);
+    pub fn named_individual(&mut self, parent: Option<Kind<B>>, e: &NamedIndividual<A>) {
+        let new_parent = self.0.visit_named_individual(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn annotated_component(&mut self, e: &AnnotatedComponent<A>) {
-        self.0.visit_annotated_component(e);
-        self.component(&e.component);
-        self.annotation_set(&e.ann);
+    pub fn annotated_component(&mut self, parent: Option<Kind<B>>, e: &AnnotatedComponent<A>) {
+        let new_parent = self.0.visit_annotated_component(parent, e);
+        self.component(new_parent.clone(), &e.component);
+        self.annotation_set(new_parent, &e.ann);
     }
 
-    pub fn component(&mut self, e: &Component<A>) {
-        self.0.visit_component(e);
+    pub fn component(&mut self, parent: Option<Kind<B>>, e: &Component<A>) {
+        let new_parent = self.0.visit_component(parent, e);
         match e {
-            Component::OntologyID(ax) => self.ontology_id(ax),
-            Component::DocIRI(ax) => self.dociri(ax),
-            Component::Import(ax) => self.import(ax),
-            Component::OntologyAnnotation(ax) => self.ontology_annotation(ax),
-            Component::DeclareClass(ax) => self.declare_class(ax),
-            Component::DeclareObjectProperty(ax) => self.declare_object_property(ax),
-            Component::DeclareAnnotationProperty(ax) => self.declare_annotation_property(ax),
-            Component::DeclareDataProperty(ax) => self.declare_data_property(ax),
-            Component::DeclareNamedIndividual(ax) => self.declare_named_individual(ax),
-            Component::DeclareDatatype(ax) => self.declare_datatype(ax),
-            Component::SubClassOf(ax) => self.sub_class_of(ax),
-            Component::EquivalentClasses(ax) => self.equivalent_classes(ax),
-            Component::DisjointClasses(ax) => self.disjoint_classes(ax),
-            Component::DisjointUnion(ax) => self.disjoint_union(ax),
-            Component::SubObjectPropertyOf(ax) => self.sub_object_property_of(ax),
-            Component::EquivalentObjectProperties(ax) => self.equivalent_object_properties(ax),
-            Component::DisjointObjectProperties(ax) => self.disjoint_object_properties(ax),
-            Component::InverseObjectProperties(ax) => self.inverse_object_properties(ax),
-            Component::ObjectPropertyDomain(ax) => self.object_property_domain(ax),
-            Component::ObjectPropertyRange(ax) => self.object_property_range(ax),
-            Component::FunctionalObjectProperty(ax) => self.functional_object_property(ax),
+            Component::OntologyID(ax) => self.ontology_id(new_parent.clone(), ax),
+            Component::DocIRI(ax) => self.dociri(new_parent.clone(), ax),
+            Component::Import(ax) => self.import(new_parent.clone(), ax),
+            Component::OntologyAnnotation(ax) => self.ontology_annotation(new_parent.clone(), ax),
+            Component::DeclareClass(ax) => self.declare_class(new_parent.clone(), ax),
+            Component::DeclareObjectProperty(ax) => {
+                self.declare_object_property(new_parent.clone(), ax)
+            }
+            Component::DeclareAnnotationProperty(ax) => {
+                self.declare_annotation_property(new_parent.clone(), ax)
+            }
+            Component::DeclareDataProperty(ax) => {
+                self.declare_data_property(new_parent.clone(), ax)
+            }
+            Component::DeclareNamedIndividual(ax) => {
+                self.declare_named_individual(new_parent.clone(), ax)
+            }
+            Component::DeclareDatatype(ax) => self.declare_datatype(new_parent.clone(), ax),
+            Component::SubClassOf(ax) => self.sub_class_of(new_parent.clone(), ax),
+            Component::EquivalentClasses(ax) => self.equivalent_classes(new_parent.clone(), ax),
+            Component::DisjointClasses(ax) => self.disjoint_classes(new_parent.clone(), ax),
+            Component::DisjointUnion(ax) => self.disjoint_union(new_parent.clone(), ax),
+            Component::SubObjectPropertyOf(ax) => {
+                self.sub_object_property_of(new_parent.clone(), ax)
+            }
+            Component::EquivalentObjectProperties(ax) => {
+                self.equivalent_object_properties(new_parent.clone(), ax)
+            }
+            Component::DisjointObjectProperties(ax) => {
+                self.disjoint_object_properties(new_parent.clone(), ax)
+            }
+            Component::InverseObjectProperties(ax) => {
+                self.inverse_object_properties(new_parent.clone(), ax)
+            }
+            Component::ObjectPropertyDomain(ax) => {
+                self.object_property_domain(new_parent.clone(), ax)
+            }
+            Component::ObjectPropertyRange(ax) => {
+                self.object_property_range(new_parent.clone(), ax)
+            }
+            Component::FunctionalObjectProperty(ax) => {
+                self.functional_object_property(new_parent.clone(), ax)
+            }
             Component::InverseFunctionalObjectProperty(ax) => {
-                self.inverse_functional_object_property(ax)
+                self.inverse_functional_object_property(new_parent.clone(), ax)
             }
-            Component::ReflexiveObjectProperty(ax) => self.reflexive_object_property(ax),
-            Component::IrreflexiveObjectProperty(ax) => self.irreflexive_object_property(ax),
-            Component::SymmetricObjectProperty(ax) => self.symmetric_object_property(ax),
-            Component::AsymmetricObjectProperty(ax) => self.asymmetric_object_property(ax),
-            Component::TransitiveObjectProperty(ax) => self.transitive_object_property(ax),
-            Component::SubDataPropertyOf(ax) => self.sub_data_property_of(ax),
-            Component::EquivalentDataProperties(ax) => self.equivalent_data_properties(ax),
-            Component::DisjointDataProperties(ax) => self.disjoint_data_properties(ax),
-            Component::DataPropertyDomain(ax) => self.data_property_domain(ax),
-            Component::DataPropertyRange(ax) => self.data_property_range(ax),
-            Component::FunctionalDataProperty(ax) => self.functional_data_property(ax),
-            Component::DatatypeDefinition(ax) => self.datatype_definition(ax),
-            Component::HasKey(ax) => self.has_key(ax),
-            Component::SameIndividual(ax) => self.same_individual(ax),
-            Component::DifferentIndividuals(ax) => self.different_individuals(ax),
-            Component::ClassAssertion(ax) => self.class_assertion(ax),
-            Component::ObjectPropertyAssertion(ax) => self.object_property_assertion(ax),
+            Component::ReflexiveObjectProperty(ax) => {
+                self.reflexive_object_property(new_parent.clone(), ax)
+            }
+            Component::IrreflexiveObjectProperty(ax) => {
+                self.irreflexive_object_property(new_parent.clone(), ax)
+            }
+            Component::SymmetricObjectProperty(ax) => {
+                self.symmetric_object_property(new_parent.clone(), ax)
+            }
+            Component::AsymmetricObjectProperty(ax) => {
+                self.asymmetric_object_property(new_parent.clone(), ax)
+            }
+            Component::TransitiveObjectProperty(ax) => {
+                self.transitive_object_property(new_parent.clone(), ax)
+            }
+            Component::SubDataPropertyOf(ax) => self.sub_data_property_of(new_parent.clone(), ax),
+            Component::EquivalentDataProperties(ax) => {
+                self.equivalent_data_properties(new_parent.clone(), ax)
+            }
+            Component::DisjointDataProperties(ax) => {
+                self.disjoint_data_properties(new_parent.clone(), ax)
+            }
+            Component::DataPropertyDomain(ax) => self.data_property_domain(new_parent.clone(), ax),
+            Component::DataPropertyRange(ax) => self.data_property_range(new_parent.clone(), ax),
+            Component::FunctionalDataProperty(ax) => {
+                self.functional_data_property(new_parent.clone(), ax)
+            }
+            Component::DatatypeDefinition(ax) => self.datatype_definition(new_parent.clone(), ax),
+            Component::HasKey(ax) => self.has_key(new_parent.clone(), ax),
+            Component::SameIndividual(ax) => self.same_individual(new_parent.clone(), ax),
+            Component::DifferentIndividuals(ax) => {
+                self.different_individuals(new_parent.clone(), ax)
+            }
+            Component::ClassAssertion(ax) => self.class_assertion(new_parent.clone(), ax),
+            Component::ObjectPropertyAssertion(ax) => {
+                self.object_property_assertion(new_parent.clone(), ax)
+            }
             Component::NegativeObjectPropertyAssertion(ax) => {
-                self.negative_object_property_assertion(ax)
+                self.negative_object_property_assertion(new_parent.clone(), ax)
             }
-            Component::DataPropertyAssertion(ax) => self.data_property_assertion(ax),
+            Component::DataPropertyAssertion(ax) => {
+                self.data_property_assertion(new_parent.clone(), ax)
+            }
             Component::NegativeDataPropertyAssertion(ax) => {
-                self.negative_data_property_assertion(ax)
+                self.negative_data_property_assertion(new_parent.clone(), ax)
             }
-            Component::AnnotationAssertion(ax) => self.annotation_assertion(ax),
-            Component::SubAnnotationPropertyOf(ax) => self.sub_annotation_property_of(ax),
-            Component::AnnotationPropertyDomain(ax) => self.annotation_property_domain(ax),
-            Component::AnnotationPropertyRange(ax) => self.annotation_property_range(ax),
-            Component::Rule(sr) => self.rule(sr),
+            Component::AnnotationAssertion(ax) => self.annotation_assertion(new_parent.clone(), ax),
+            Component::SubAnnotationPropertyOf(ax) => {
+                self.sub_annotation_property_of(new_parent.clone(), ax)
+            }
+            Component::AnnotationPropertyDomain(ax) => {
+                self.annotation_property_domain(new_parent.clone(), ax)
+            }
+            Component::AnnotationPropertyRange(ax) => {
+                self.annotation_property_range(new_parent.clone(), ax)
+            }
+            Component::Rule(sr) => self.rule(new_parent.clone(), sr),
         }
     }
 
-    pub fn import(&mut self, e: &Import<A>) {
-        self.0.visit_import(e);
-        self.iri(&e.0);
+    pub fn import(&mut self, parent: Option<Kind<B>>, e: &Import<A>) {
+        let new_parent = self.0.visit_import(parent, e);
+        self.iri(new_parent, &e.0);
     }
 
-    pub fn ontology_annotation(&mut self, e: &OntologyAnnotation<A>) {
-        self.0.visit_ontology_annotation(e);
-        self.annotation(&e.0);
+    pub fn ontology_annotation(&mut self, parent: Option<Kind<B>>, e: &OntologyAnnotation<A>) {
+        let new_parent = self.0.visit_ontology_annotation(parent, e);
+        self.annotation(new_parent, &e.0);
     }
 
-    pub fn declare_class(&mut self, e: &DeclareClass<A>) {
-        self.0.visit_declare_class(e);
-        self.class(&e.0);
+    pub fn declare_class(&mut self, parent: Option<Kind<B>>, e: &DeclareClass<A>) {
+        let new_parent = self.0.visit_declare_class(parent, e);
+        self.class(new_parent, &e.0);
     }
 
-    pub fn declare_object_property(&mut self, e: &DeclareObjectProperty<A>) {
-        self.0.visit_declare_object_property(e);
-        self.object_property(&e.0);
+    pub fn declare_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &DeclareObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_declare_object_property(parent, e);
+        self.object_property(new_parent, &e.0);
     }
 
-    pub fn declare_annotation_property(&mut self, e: &DeclareAnnotationProperty<A>) {
-        self.0.visit_declare_annotation_property(e);
-        self.annotation_property(&e.0);
+    pub fn declare_annotation_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &DeclareAnnotationProperty<A>,
+    ) {
+        let new_parent = self.0.visit_declare_annotation_property(parent, e);
+        self.annotation_property(new_parent, &e.0);
     }
 
-    pub fn declare_data_property(&mut self, e: &DeclareDataProperty<A>) {
-        self.0.visit_declare_data_property(e);
-        self.data_property(&e.0);
+    pub fn declare_data_property(&mut self, parent: Option<Kind<B>>, e: &DeclareDataProperty<A>) {
+        let new_parent = self.0.visit_declare_data_property(parent, e);
+        self.data_property(new_parent, &e.0);
     }
 
-    pub fn declare_named_individual(&mut self, e: &DeclareNamedIndividual<A>) {
-        self.0.visit_declare_named_individual(e);
-        self.named_individual(&e.0);
+    pub fn declare_named_individual(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &DeclareNamedIndividual<A>,
+    ) {
+        let new_parent = self.0.visit_declare_named_individual(parent, e);
+        self.named_individual(new_parent, &e.0);
     }
 
-    pub fn declare_datatype(&mut self, e: &DeclareDatatype<A>) {
-        self.0.visit_declare_datatype(e);
-        self.datatype(&e.0);
+    pub fn declare_datatype(&mut self, parent: Option<Kind<B>>, e: &DeclareDatatype<A>) {
+        let new_parent = self.0.visit_declare_datatype(parent, e);
+        self.datatype(new_parent, &e.0);
     }
 
-    pub fn sub_class_of(&mut self, e: &SubClassOf<A>) {
-        self.0.visit_sub_class_of(e);
-        self.class_expression(&e.sup);
-        self.class_expression(&e.sub);
+    pub fn sub_class_of(&mut self, parent: Option<Kind<B>>, e: &SubClassOf<A>) {
+        let new_parent = self.0.visit_sub_class_of(parent, e);
+        self.class_expression(new_parent.clone(), &e.sup);
+        self.class_expression(new_parent, &e.sub);
     }
 
-    pub fn equivalent_classes(&mut self, e: &EquivalentClasses<A>) {
-        self.0.visit_equivalent_classes(e);
-        self.class_expression_vec(&e.0);
+    pub fn equivalent_classes(&mut self, parent: Option<Kind<B>>, e: &EquivalentClasses<A>) {
+        let new_parent = self.0.visit_equivalent_classes(parent, e);
+        self.class_expression_vec(new_parent, &e.0);
     }
 
-    pub fn disjoint_classes(&mut self, e: &DisjointClasses<A>) {
-        self.0.visit_disjoint_classes(e);
-        self.class_expression_vec(&e.0);
+    pub fn disjoint_classes(&mut self, parent: Option<Kind<B>>, e: &DisjointClasses<A>) {
+        let new_parent = self.0.visit_disjoint_classes(parent, e);
+        self.class_expression_vec(new_parent, &e.0);
     }
 
-    pub fn disjoint_union(&mut self, e: &DisjointUnion<A>) {
-        self.0.visit_disjoint_union(e);
-        self.class(&e.0);
-        self.class_expression_vec(&e.1);
+    pub fn disjoint_union(&mut self, parent: Option<Kind<B>>, e: &DisjointUnion<A>) {
+        let new_parent = self.0.visit_disjoint_union(parent, e);
+        self.class(new_parent.clone(), &e.0);
+        self.class_expression_vec(new_parent, &e.1);
     }
 
-    pub fn sub_object_property_of(&mut self, e: &SubObjectPropertyOf<A>) {
-        self.0.visit_sub_object_property_of(e);
-        self.object_property_expression(&e.sup);
-        self.sub_object_property_expression(&e.sub);
+    pub fn sub_object_property_of(&mut self, parent: Option<Kind<B>>, e: &SubObjectPropertyOf<A>) {
+        let new_parent = self.0.visit_sub_object_property_of(parent, e);
+        self.object_property_expression(new_parent.clone(), &e.sup);
+        self.sub_object_property_expression(new_parent, &e.sub);
     }
 
-    pub fn equivalent_object_properties(&mut self, e: &EquivalentObjectProperties<A>) {
-        self.0.visit_equivalent_object_properties(e);
-        self.object_property_expression_vec(&e.0);
+    pub fn equivalent_object_properties(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &EquivalentObjectProperties<A>,
+    ) {
+        let new_parent = self.0.visit_equivalent_object_properties(parent, e);
+        self.object_property_expression_vec(new_parent, &e.0);
     }
 
-    pub fn disjoint_object_properties(&mut self, e: &DisjointObjectProperties<A>) {
-        self.0.visit_disjoint_object_properties(e);
-        self.object_property_expression_vec(&e.0);
+    pub fn disjoint_object_properties(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &DisjointObjectProperties<A>,
+    ) {
+        let new_parent = self.0.visit_disjoint_object_properties(parent, e);
+        self.object_property_expression_vec(new_parent, &e.0);
     }
 
-    pub fn inverse_object_properties(&mut self, e: &InverseObjectProperties<A>) {
-        self.0.visit_inverse_object_properties(e);
-        self.object_property(&e.0);
-        self.object_property(&e.1);
+    pub fn inverse_object_properties(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &InverseObjectProperties<A>,
+    ) {
+        let new_parent = self.0.visit_inverse_object_properties(parent, e);
+        self.object_property(new_parent.clone(), &e.0);
+        self.object_property(new_parent, &e.1);
     }
 
-    pub fn object_property_domain(&mut self, e: &ObjectPropertyDomain<A>) {
-        self.0.visit_object_property_domain(e);
-        self.object_property_expression(&e.ope);
-        self.class_expression(&e.ce);
+    pub fn object_property_domain(&mut self, parent: Option<Kind<B>>, e: &ObjectPropertyDomain<A>) {
+        let new_parent = self.0.visit_object_property_domain(parent, e);
+        self.object_property_expression(new_parent.clone(), &e.ope);
+        self.class_expression(new_parent, &e.ce);
     }
 
-    pub fn object_property_range(&mut self, e: &ObjectPropertyRange<A>) {
-        self.0.visit_object_property_range(e);
-        self.object_property_expression(&e.ope);
-        self.class_expression(&e.ce);
+    pub fn object_property_range(&mut self, parent: Option<Kind<B>>, e: &ObjectPropertyRange<A>) {
+        let new_parent = self.0.visit_object_property_range(parent, e);
+        self.object_property_expression(new_parent.clone(), &e.ope);
+        self.class_expression(new_parent, &e.ce);
     }
 
-    pub fn functional_object_property(&mut self, e: &FunctionalObjectProperty<A>) {
-        self.0.visit_functional_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn functional_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &FunctionalObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_functional_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn inverse_functional_object_property(&mut self, e: &InverseFunctionalObjectProperty<A>) {
-        self.0.visit_inverse_functional_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn inverse_functional_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &InverseFunctionalObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_inverse_functional_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn reflexive_object_property(&mut self, e: &ReflexiveObjectProperty<A>) {
-        self.0.visit_reflexive_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn reflexive_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &ReflexiveObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_reflexive_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn irreflexive_object_property(&mut self, e: &IrreflexiveObjectProperty<A>) {
-        self.0.visit_irreflexive_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn irreflexive_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &IrreflexiveObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_irreflexive_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn symmetric_object_property(&mut self, e: &SymmetricObjectProperty<A>) {
-        self.0.visit_symmetric_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn symmetric_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &SymmetricObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_symmetric_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn asymmetric_object_property(&mut self, e: &AsymmetricObjectProperty<A>) {
-        self.0.visit_asymmetric_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn asymmetric_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &AsymmetricObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_asymmetric_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn transitive_object_property(&mut self, e: &TransitiveObjectProperty<A>) {
-        self.0.visit_transitive_object_property(e);
-        self.object_property_expression(&e.0);
+    pub fn transitive_object_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &TransitiveObjectProperty<A>,
+    ) {
+        let new_parent = self.0.visit_transitive_object_property(parent, e);
+        self.object_property_expression(new_parent, &e.0);
     }
 
-    pub fn sub_data_property_of(&mut self, e: &SubDataPropertyOf<A>) {
-        self.0.visit_sub_data_property_of(e);
-        self.data_property(&e.sup);
-        self.data_property(&e.sub);
+    pub fn sub_data_property_of(&mut self, parent: Option<Kind<B>>, e: &SubDataPropertyOf<A>) {
+        let new_parent = self.0.visit_sub_data_property_of(parent, e);
+        self.data_property(new_parent.clone(), &e.sup);
+        self.data_property(new_parent, &e.sub);
     }
 
-    pub fn equivalent_data_properties(&mut self, e: &EquivalentDataProperties<A>) {
-        self.0.visit_equivalent_data_properties(e);
-        self.data_property_vec(&e.0);
+    pub fn equivalent_data_properties(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &EquivalentDataProperties<A>,
+    ) {
+        let new_parent = self.0.visit_equivalent_data_properties(parent, e);
+        self.data_property_vec(new_parent, &e.0);
     }
 
-    pub fn disjoint_data_properties(&mut self, e: &DisjointDataProperties<A>) {
-        self.0.visit_disjoint_data_properties(e);
-        self.data_property_vec(&e.0);
+    pub fn disjoint_data_properties(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &DisjointDataProperties<A>,
+    ) {
+        let new_parent = self.0.visit_disjoint_data_properties(parent, e);
+        self.data_property_vec(new_parent, &e.0);
     }
 
-    pub fn data_property_domain(&mut self, e: &DataPropertyDomain<A>) {
-        self.0.visit_data_property_domain(e);
-        self.data_property(&e.dp);
-        self.class_expression(&e.ce);
+    pub fn data_property_domain(&mut self, parent: Option<Kind<B>>, e: &DataPropertyDomain<A>) {
+        let new_parent = self.0.visit_data_property_domain(parent, e);
+        self.data_property(new_parent.clone(), &e.dp);
+        self.class_expression(new_parent, &e.ce);
     }
 
-    pub fn data_property_range(&mut self, e: &DataPropertyRange<A>) {
-        self.0.visit_data_property_range(e);
-        self.data_property(&e.dp);
-        self.data_range(&e.dr);
+    pub fn data_property_range(&mut self, parent: Option<Kind<B>>, e: &DataPropertyRange<A>) {
+        let new_parent = self.0.visit_data_property_range(parent, e);
+        self.data_property(new_parent.clone(), &e.dp);
+        self.data_range(new_parent, &e.dr);
     }
 
-    pub fn functional_data_property(&mut self, e: &FunctionalDataProperty<A>) {
-        self.0.visit_functional_data_property(e);
-        self.data_property(&e.0);
+    pub fn functional_data_property(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &FunctionalDataProperty<A>,
+    ) {
+        let new_parent = self.0.visit_functional_data_property(parent, e);
+        self.data_property(new_parent, &e.0);
     }
 
-    pub fn datatype_definition(&mut self, e: &DatatypeDefinition<A>) {
-        self.0.visit_datatype_definition(e);
-        self.datatype(&e.kind);
-        self.data_range(&e.range);
+    pub fn datatype_definition(&mut self, parent: Option<Kind<B>>, e: &DatatypeDefinition<A>) {
+        let new_parent = self.0.visit_datatype_definition(parent, e);
+        self.datatype(new_parent.clone(), &e.kind);
+        self.data_range(new_parent, &e.range);
     }
 
-    pub fn has_key(&mut self, e: &HasKey<A>) {
-        self.0.visit_has_key(e);
-        self.class_expression(&e.ce);
+    pub fn has_key(&mut self, parent: Option<Kind<B>>, e: &HasKey<A>) {
+        let new_parent = self.0.visit_has_key(parent, e);
+        self.class_expression(new_parent.clone(), &e.ce);
         for i in e.vpe.iter() {
-            self.property_expression(i);
+            self.property_expression(new_parent.clone(), i);
         }
     }
 
-    pub fn same_individual(&mut self, e: &SameIndividual<A>) {
-        self.0.visit_same_individual(e);
-        self.individual_vec(&e.0);
+    pub fn same_individual(&mut self, parent: Option<Kind<B>>, e: &SameIndividual<A>) {
+        let new_parent = self.0.visit_same_individual(parent, e);
+        self.individual_vec(new_parent, &e.0);
     }
 
-    pub fn different_individuals(&mut self, e: &DifferentIndividuals<A>) {
-        self.0.visit_different_individuals(e);
-        self.individual_vec(&e.0);
+    pub fn different_individuals(&mut self, parent: Option<Kind<B>>, e: &DifferentIndividuals<A>) {
+        let new_parent = self.0.visit_different_individuals(parent, e);
+        self.individual_vec(new_parent, &e.0);
     }
 
-    pub fn class_assertion(&mut self, e: &ClassAssertion<A>) {
-        self.0.visit_class_assertion(e);
-        self.class_expression(&e.ce);
-        self.individual(&e.i);
+    pub fn class_assertion(&mut self, parent: Option<Kind<B>>, e: &ClassAssertion<A>) {
+        let new_parent = self.0.visit_class_assertion(parent, e);
+        self.class_expression(new_parent.clone(), &e.ce);
+        self.individual(new_parent, &e.i);
     }
 
-    pub fn object_property_assertion(&mut self, e: &ObjectPropertyAssertion<A>) {
-        self.0.visit_object_property_assertion(e);
-        self.object_property_expression(&e.ope);
-        self.individual(&e.from);
-        self.individual(&e.to);
+    pub fn object_property_assertion(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &ObjectPropertyAssertion<A>,
+    ) {
+        let new_parent = self.0.visit_object_property_assertion(parent, e);
+        self.object_property_expression(new_parent.clone(), &e.ope);
+        self.individual(new_parent.clone(), &e.from);
+        self.individual(new_parent, &e.to);
     }
 
-    pub fn negative_object_property_assertion(&mut self, e: &NegativeObjectPropertyAssertion<A>) {
-        self.0.visit_negative_object_property_assertion(e);
-        self.object_property_expression(&e.ope);
-        self.individual(&e.from);
-        self.individual(&e.to);
+    pub fn negative_object_property_assertion(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &NegativeObjectPropertyAssertion<A>,
+    ) {
+        let new_parent = self.0.visit_negative_object_property_assertion(parent, e);
+        self.object_property_expression(new_parent.clone(), &e.ope);
+        self.individual(new_parent.clone(), &e.from);
+        self.individual(new_parent, &e.to);
     }
 
-    pub fn data_property_assertion(&mut self, e: &DataPropertyAssertion<A>) {
-        self.0.visit_data_property_assertion(e);
-        self.data_property(&e.dp);
-        self.individual(&e.from);
-        self.literal(&e.to);
+    pub fn data_property_assertion(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &DataPropertyAssertion<A>,
+    ) {
+        let new_parent = self.0.visit_data_property_assertion(parent, e);
+        self.data_property(new_parent.clone(), &e.dp);
+        self.individual(new_parent.clone(), &e.from);
+        self.literal(new_parent, &e.to);
     }
 
-    pub fn negative_data_property_assertion(&mut self, e: &NegativeDataPropertyAssertion<A>) {
-        self.0.visit_negative_data_property_assertion(e);
-        self.data_property(&e.dp);
-        self.individual(&e.from);
-        self.literal(&e.to);
+    pub fn negative_data_property_assertion(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &NegativeDataPropertyAssertion<A>,
+    ) {
+        let new_parent = self.0.visit_negative_data_property_assertion(parent, e);
+        self.data_property(new_parent.clone(), &e.dp);
+        self.individual(new_parent.clone(), &e.from);
+        self.literal(new_parent, &e.to);
     }
 
-    pub fn annotation_assertion(&mut self, e: &AnnotationAssertion<A>) {
-        self.0.visit_annotation_assertion(e);
-        self.annotation_subject(&e.subject);
-        self.annotation(&e.ann);
+    pub fn annotation_assertion(&mut self, parent: Option<Kind<B>>, e: &AnnotationAssertion<A>) {
+        let new_parent = self.0.visit_annotation_assertion(parent, e);
+        self.annotation_subject(new_parent.clone(), &e.subject);
+        self.annotation(new_parent, &e.ann);
     }
 
-    pub fn sub_annotation_property_of(&mut self, e: &SubAnnotationPropertyOf<A>) {
-        self.0.visit_sub_annotation_property_of(e);
-        self.annotation_property(&e.sup);
-        self.annotation_property(&e.sub);
+    pub fn sub_annotation_property_of(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &SubAnnotationPropertyOf<A>,
+    ) {
+        let new_parent = self.0.visit_sub_annotation_property_of(parent, e);
+        self.annotation_property(new_parent.clone(), &e.sup);
+        self.annotation_property(new_parent, &e.sub);
     }
 
-    pub fn annotation_property_domain(&mut self, e: &AnnotationPropertyDomain<A>) {
-        self.0.visit_annotation_property_domain(e);
-        self.annotation_property(&e.ap);
-        self.iri(&e.iri);
+    pub fn annotation_property_domain(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &AnnotationPropertyDomain<A>,
+    ) {
+        let new_parent = self.0.visit_annotation_property_domain(parent, e);
+        self.annotation_property(new_parent.clone(), &e.ap);
+        self.iri(new_parent, &e.iri);
     }
 
-    pub fn annotation_property_range(&mut self, e: &AnnotationPropertyRange<A>) {
-        self.0.visit_annotation_property_range(e);
-        self.annotation_property(&e.ap);
-        self.iri(&e.iri);
+    pub fn annotation_property_range(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &AnnotationPropertyRange<A>,
+    ) {
+        let new_parent = self.0.visit_annotation_property_range(parent, e);
+        self.annotation_property(new_parent.clone(), &e.ap);
+        self.iri(new_parent, &e.iri);
     }
 
-    pub fn rule(&mut self, r: &Rule<A>) {
-        self.0.visit_rule(r);
-        self.atom_vec(&r.head);
-        self.atom_vec(&r.body);
+    pub fn rule(&mut self, parent: Option<Kind<B>>, r: &Rule<A>) {
+        let new_parent = self.0.visit_rule(parent, r);
+        self.atom_vec(new_parent.clone(), &r.head);
+        self.atom_vec(new_parent, &r.body);
     }
 
-    pub fn atom(&mut self, a: &Atom<A>) {
-        self.0.visit_atom(a);
+    pub fn atom(&mut self, parent: Option<Kind<B>>, a: &Atom<A>) {
+        let new_parent = self.0.visit_atom(parent, a);
         match a {
             Atom::BuiltInAtom { pred, args } => {
-                self.iri(pred);
-                self.darg_vec(args);
+                let branch_parent = new_parent.clone();
+                self.iri(branch_parent.clone(), pred);
+                self.darg_vec(branch_parent, args);
             }
             Atom::ClassAtom { pred, arg } => {
-                self.class_expression(pred);
-                self.iarg(arg);
+                let branch_parent = new_parent.clone();
+                self.class_expression(branch_parent.clone(), pred);
+                self.iarg(branch_parent, arg);
             }
             Atom::DataPropertyAtom { pred, args } => {
-                self.data_property(pred);
-                self.darg(&args.0);
-                self.darg(&args.1);
+                let branch_parent = new_parent.clone();
+                self.data_property(branch_parent.clone(), pred);
+                self.darg(branch_parent.clone(), &args.0);
+                self.darg(branch_parent, &args.1);
             }
             Atom::DataRangeAtom { pred, arg } => {
-                self.data_range(pred);
-                self.darg(arg);
+                let branch_parent = new_parent.clone();
+                self.data_range(branch_parent.clone(), pred);
+                self.darg(branch_parent, arg);
             }
             Atom::DifferentIndividualsAtom(arg1, arg2) => {
-                self.iarg(arg1);
-                self.iarg(arg2);
+                let branch_parent = new_parent.clone();
+                self.iarg(branch_parent.clone(), arg1);
+                self.iarg(branch_parent, arg2);
             }
             Atom::ObjectPropertyAtom { pred, args } => {
-                self.object_property_expression(pred);
-                self.iarg(&args.0);
-                self.iarg(&args.1);
+                let branch_parent = new_parent.clone();
+                self.object_property_expression(branch_parent.clone(), pred);
+                self.iarg(branch_parent.clone(), &args.0);
+                self.iarg(branch_parent, &args.1);
             }
             Atom::SameIndividualAtom(arg1, arg2) => {
-                self.iarg(arg1);
-                self.iarg(arg2);
+                let branch_parent = new_parent.clone();
+                self.iarg(branch_parent.clone(), arg1);
+                self.iarg(branch_parent, arg2);
             }
         }
     }
 
-    pub fn variable(&mut self, v: &Variable<A>) {
-        self.0.visit_variable(v);
+    pub fn variable(&mut self, parent: Option<Kind<B>>, v: &Variable<A>) {
+        self.0.visit_variable(parent, v);
     }
 
-    pub fn darg(&mut self, d: &DArgument<A>) {
-        self.0.visit_darg(d);
+    pub fn darg(&mut self, parent: Option<Kind<B>>, d: &DArgument<A>) {
+        let new_parent = self.0.visit_darg(parent, d);
         match d {
-            DArgument::Literal(l) => self.literal(l),
-            DArgument::Variable(v) => self.variable(v),
+            DArgument::Literal(l) => self.literal(new_parent.clone(), l),
+            DArgument::Variable(v) => self.variable(new_parent.clone(), v),
         }
     }
 
-    pub fn iarg(&mut self, i: &IArgument<A>) {
-        self.0.visit_iarg(i);
+    pub fn iarg(&mut self, parent: Option<Kind<B>>, i: &IArgument<A>) {
+        let new_parent = self.0.visit_iarg(parent, i);
         match i {
-            IArgument::Individual(i) => self.individual(i),
-            IArgument::Variable(v) => self.variable(v),
+            IArgument::Individual(ind) => self.individual(new_parent.clone(), ind),
+            IArgument::Variable(v) => self.variable(new_parent.clone(), v),
         }
     }
 
-    pub fn literal(&mut self, e: &Literal<A>) {
-        self.0.visit_literal(e);
+    pub fn literal(&mut self, parent: Option<Kind<B>>, e: &Literal<A>) {
+        let new_parent = self.0.visit_literal(parent, e);
         match e {
             Literal::Simple { literal } => {
-                self.0.visit_string(literal);
+                self.0.visit_string(new_parent.clone(), literal);
             }
             Literal::Language { literal, lang } => {
-                self.0.visit_string(literal);
-                self.0.visit_string(lang);
+                self.0.visit_string(new_parent.clone(), literal);
+                self.0.visit_string(new_parent.clone(), lang);
             }
             Literal::Datatype {
                 literal: _,
                 datatype_iri,
-            } => self.iri(datatype_iri),
+            } => self.iri(new_parent.clone(), datatype_iri),
         }
     }
 
-    pub fn annotation(&mut self, e: &Annotation<A>) {
-        self.0.visit_annotation(e);
-        self.annotation_property(&e.ap);
-        self.annotation_value(&e.av);
+    pub fn annotation(&mut self, parent: Option<Kind<B>>, e: &Annotation<A>) {
+        let new_parent = self.0.visit_annotation(parent, e);
+        self.annotation_property(new_parent.clone(), &e.ap);
+        self.annotation_value(new_parent, &e.av);
     }
 
-    pub fn annotation_value(&mut self, e: &AnnotationValue<A>) {
-        self.0.visit_annotation_value(e);
+    pub fn annotation_value(&mut self, parent: Option<Kind<B>>, e: &AnnotationValue<A>) {
+        let new_parent = self.0.visit_annotation_value(parent, e);
         match e {
-            AnnotationValue::Literal(e) => self.literal(e),
-            AnnotationValue::IRI(e) => self.iri(e),
-            AnnotationValue::AnonymousIndividual(a) => self.anonymous_individual(a),
+            AnnotationValue::Literal(lit) => self.literal(new_parent.clone(), lit),
+            AnnotationValue::IRI(iri) => self.iri(new_parent.clone(), iri),
+            AnnotationValue::AnonymousIndividual(anon) => {
+                self.anonymous_individual(new_parent.clone(), anon)
+            }
         }
     }
 
-    pub fn object_property_expression(&mut self, e: &ObjectPropertyExpression<A>) {
-        self.0.visit_object_property_expression(e);
+    pub fn object_property_expression(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &ObjectPropertyExpression<A>,
+    ) {
+        let new_parent = self.0.visit_object_property_expression(parent, e);
         match e {
-            ObjectPropertyExpression::ObjectProperty(e) => self.object_property(e),
-            ObjectPropertyExpression::InverseObjectProperty(e) => self.object_property(e),
+            ObjectPropertyExpression::ObjectProperty(prop) => {
+                self.object_property(new_parent.clone(), prop)
+            }
+            ObjectPropertyExpression::InverseObjectProperty(prop) => {
+                self.object_property(new_parent.clone(), prop)
+            }
         }
     }
 
-    pub fn sub_object_property_expression(&mut self, e: &SubObjectPropertyExpression<A>) {
-        self.0.visit_sub_object_property_expression(e);
+    pub fn sub_object_property_expression(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &SubObjectPropertyExpression<A>,
+    ) {
+        let new_parent = self.0.visit_sub_object_property_expression(parent, e);
         match e {
             SubObjectPropertyExpression::ObjectPropertyChain(e) => {
-                self.object_property_expression_vec(e)
+                self.object_property_expression_vec(new_parent.clone(), e)
             }
             SubObjectPropertyExpression::ObjectPropertyExpression(e) => {
-                self.object_property_expression(e)
+                self.object_property_expression(new_parent.clone(), e)
             }
         }
     }
 
-    pub fn property_expression(&mut self, e: &PropertyExpression<A>) {
-        self.0.visit_property_expression(e);
+    pub fn property_expression(&mut self, parent: Option<Kind<B>>, e: &PropertyExpression<A>) {
+        let new_parent = self.0.visit_property_expression(parent, e);
         match e {
-            PropertyExpression::ObjectPropertyExpression(e) => self.object_property_expression(e),
-            PropertyExpression::DataProperty(e) => self.data_property(e),
-            PropertyExpression::AnnotationProperty(e) => self.annotation_property(e),
+            PropertyExpression::ObjectPropertyExpression(ope) => {
+                self.object_property_expression(new_parent.clone(), ope)
+            }
+            PropertyExpression::DataProperty(dp) => self.data_property(new_parent.clone(), dp),
+            PropertyExpression::AnnotationProperty(ap) => {
+                self.annotation_property(new_parent.clone(), ap)
+            }
         }
     }
 
-    pub fn facet_restriction(&mut self, e: &FacetRestriction<A>) {
-        self.0.visit_facet_restriction(e);
-        self.facet(&e.f);
-        self.literal(&e.l);
+    pub fn facet_restriction(&mut self, parent: Option<Kind<B>>, e: &FacetRestriction<A>) {
+        let new_parent = self.0.visit_facet_restriction(parent, e);
+        self.facet(new_parent.clone(), &e.f);
+        self.literal(new_parent.clone(), &e.l);
     }
 
-    pub fn facet(&mut self, e: &Facet) {
-        self.0.visit_facet(e);
+    pub fn facet(&mut self, parent: Option<Kind<B>>, e: &Facet) {
+        self.0.visit_facet(parent, e);
     }
 
-    pub fn data_range(&mut self, e: &DataRange<A>) {
-        self.0.visit_data_range(e);
+    pub fn data_range(&mut self, parent: Option<Kind<B>>, e: &DataRange<A>) {
+        let new_parent = self.0.visit_data_range(parent, e);
         match e {
-            DataRange::Datatype(e) => self.datatype(e),
-            DataRange::DataIntersectionOf(e) => self.data_range_vec(e),
-            DataRange::DataUnionOf(e) => self.data_range_vec(e),
-            DataRange::DataComplementOf(e) => self.data_range(e),
-            DataRange::DataOneOf(e) => self.literal_vec(e),
+            DataRange::Datatype(dt) => self.datatype(new_parent.clone(), dt),
+            DataRange::DataIntersectionOf(v) => self.data_range_vec(new_parent.clone(), v),
+            DataRange::DataUnionOf(v) => self.data_range_vec(new_parent.clone(), v),
+            DataRange::DataComplementOf(inner) => self.data_range(new_parent.clone(), inner),
+            DataRange::DataOneOf(v) => self.literal_vec(new_parent.clone(), v),
             DataRange::DatatypeRestriction(dt, v) => {
-                self.datatype(dt);
-                self.facet_restriction_vec(v);
+                self.datatype(new_parent.clone(), dt);
+                self.facet_restriction_vec(new_parent.clone(), v);
             }
         }
     }
 
-    pub fn class_expression(&mut self, e: &ClassExpression<A>) {
-        self.0.visit_class_expression(e);
+    pub fn class_expression(&mut self, parent: Option<Kind<B>>, e: &ClassExpression<A>) {
+        let new_parent = self.0.visit_class_expression(parent, e);
         match e {
-            ClassExpression::Class(e) => self.class(e),
-            ClassExpression::ObjectIntersectionOf(e) => self.class_expression_vec(e),
-            ClassExpression::ObjectUnionOf(e) => self.class_expression_vec(e),
-            ClassExpression::ObjectComplementOf(e) => self.class_expression(e),
-            ClassExpression::ObjectOneOf(e) => self.individual_vec(e),
+            ClassExpression::Class(cls) => self.class(new_parent.clone(), cls),
+            ClassExpression::ObjectIntersectionOf(v) => {
+                self.class_expression_vec(new_parent.clone(), v)
+            }
+            ClassExpression::ObjectUnionOf(v) => self.class_expression_vec(new_parent.clone(), v),
+            ClassExpression::ObjectComplementOf(inner) => {
+                self.class_expression(new_parent.clone(), inner)
+            }
+            ClassExpression::ObjectOneOf(v) => self.individual_vec(new_parent.clone(), v),
             ClassExpression::ObjectSomeValuesFrom { ope, bce } => {
-                self.object_property_expression(ope);
-                self.class_expression(bce);
+                self.object_property_expression(new_parent.clone(), ope);
+                self.class_expression(new_parent.clone(), bce);
             }
             ClassExpression::ObjectAllValuesFrom { ope, bce } => {
-                self.object_property_expression(ope);
-                self.class_expression(bce);
+                self.object_property_expression(new_parent.clone(), ope);
+                self.class_expression(new_parent.clone(), bce);
             }
             ClassExpression::ObjectHasValue { ope, i } => {
-                self.object_property_expression(ope);
-                self.individual(i);
+                self.object_property_expression(new_parent.clone(), ope);
+                self.individual(new_parent.clone(), i);
             }
-            ClassExpression::ObjectHasSelf(e) => self.object_property_expression(e),
+            ClassExpression::ObjectHasSelf(ope) => {
+                self.object_property_expression(new_parent.clone(), ope)
+            }
             ClassExpression::ObjectMinCardinality { n, ope, bce } => {
-                self.0.visit_u32(n);
-                self.object_property_expression(ope);
-                self.class_expression(bce);
+                self.0.visit_u32(new_parent.clone(), n);
+                self.object_property_expression(new_parent.clone(), ope);
+                self.class_expression(new_parent.clone(), bce);
             }
             ClassExpression::ObjectMaxCardinality { n, ope, bce } => {
-                self.0.visit_u32(n);
-                self.object_property_expression(ope);
-                self.class_expression(bce);
+                self.0.visit_u32(new_parent.clone(), n);
+                self.object_property_expression(new_parent.clone(), ope);
+                self.class_expression(new_parent.clone(), bce);
             }
             ClassExpression::ObjectExactCardinality { n, ope, bce } => {
-                self.0.visit_u32(n);
-                self.object_property_expression(ope);
-                self.class_expression(bce);
+                self.0.visit_u32(new_parent.clone(), n);
+                self.object_property_expression(new_parent.clone(), ope);
+                self.class_expression(new_parent.clone(), bce);
             }
             ClassExpression::DataSomeValuesFrom { dp, dr } => {
-                self.data_property(dp);
-                self.data_range(dr);
+                self.data_property(new_parent.clone(), dp);
+                self.data_range(new_parent.clone(), dr);
             }
             ClassExpression::DataAllValuesFrom { dp, dr } => {
-                self.data_property(dp);
-                self.data_range(dr);
+                self.data_property(new_parent.clone(), dp);
+                self.data_range(new_parent.clone(), dr);
             }
             ClassExpression::DataHasValue { dp, l } => {
-                self.data_property(dp);
-                self.literal(l);
+                self.data_property(new_parent.clone(), dp);
+                self.literal(new_parent.clone(), l);
             }
             ClassExpression::DataMinCardinality { n, dp, dr } => {
-                self.0.visit_u32(n);
-                self.data_property(dp);
-                self.data_range(dr);
+                self.0.visit_u32(new_parent.clone(), n);
+                self.data_property(new_parent.clone(), dp);
+                self.data_range(new_parent.clone(), dr);
             }
             ClassExpression::DataMaxCardinality { n, dp, dr } => {
-                self.0.visit_u32(n);
-                self.data_property(dp);
-                self.data_range(dr);
+                self.0.visit_u32(new_parent.clone(), n);
+                self.data_property(new_parent.clone(), dp);
+                self.data_range(new_parent.clone(), dr);
             }
             ClassExpression::DataExactCardinality { n, dp, dr } => {
-                self.0.visit_u32(n);
-                self.data_property(dp);
-                self.data_range(dr);
+                self.0.visit_u32(new_parent.clone(), n);
+                self.data_property(new_parent.clone(), dp);
+                self.data_range(new_parent.clone(), dr);
             }
         }
     }
 
-    pub fn ontology_id(&mut self, e: &OntologyID<A>) {
-        self.0.visit_ontology_id(e);
-        self.option_iri(&e.iri);
-        self.option_iri(&e.viri);
+    pub fn ontology_id(&mut self, parent: Option<Kind<B>>, e: &OntologyID<A>) {
+        let new_parent = self.0.visit_ontology_id(parent, e);
+        self.option_iri(new_parent.clone(), &e.iri);
+        self.option_iri(new_parent, &e.viri);
     }
 
-    pub fn set_ontology(&mut self, e: &SetOntology<A>) {
-        self.0.visit_set_ontology(e);
+    pub fn set_ontology(&mut self, parent: Option<Kind<B>>, e: &SetOntology<A>) {
+        let new_parent = self.0.visit_set_ontology(parent, e);
         for i in e.iter() {
-            self.annotated_component(i);
+            self.annotated_component(new_parent.clone(), i);
         }
     }
 
-    pub fn option_iri(&mut self, e: &Option<IRI<A>>) {
-        self.0.visit_option_iri(e);
+    pub fn option_iri(&mut self, parent: Option<Kind<B>>, e: &Option<IRI<A>>) {
+        let new_parent = self.0.visit_option_iri(parent, e);
         if let Some(e) = e {
-            self.iri(e)
+            self.iri(new_parent, e)
         }
     }
 
     // Collections
-    pub fn annotation_set(&mut self, e: &BTreeSet<Annotation<A>>) {
-        self.0.visit_annotation_set(e);
+    pub fn annotation_set(&mut self, parent: Option<Kind<B>>, e: &BTreeSet<Annotation<A>>) {
+        let new_parent = self.0.visit_annotation_set(parent, e);
         for i in e.iter() {
-            self.annotation(i);
+            self.annotation(new_parent.clone(), i);
         }
     }
 
-    pub fn class_expression_vec(&mut self, e: &Vec<ClassExpression<A>>) {
-        self.0.visit_class_expression_vec(e);
+    pub fn class_expression_vec(&mut self, parent: Option<Kind<B>>, e: &Vec<ClassExpression<A>>) {
+        let new_parent = self.0.visit_class_expression_vec(parent, e);
         for i in e.iter() {
-            self.class_expression(i);
+            self.class_expression(new_parent.clone(), i);
         }
     }
 
-    pub fn object_property_expression_vec(&mut self, e: &Vec<ObjectPropertyExpression<A>>) {
-        self.0.visit_object_property_expression_vec(e);
+    pub fn object_property_expression_vec(
+        &mut self,
+        parent: Option<Kind<B>>,
+        e: &Vec<ObjectPropertyExpression<A>>,
+    ) {
+        let new_parent = self.0.visit_object_property_expression_vec(parent, e);
         for i in e.iter() {
-            self.object_property_expression(i);
+            self.object_property_expression(new_parent.clone(), i);
         }
     }
 
-    pub fn data_property_vec(&mut self, e: &Vec<DataProperty<A>>) {
-        self.0.visit_data_property_vec(e);
+    pub fn data_property_vec(&mut self, parent: Option<Kind<B>>, e: &Vec<DataProperty<A>>) {
+        let new_parent = self.0.visit_data_property_vec(parent, e);
         for i in e.iter() {
-            self.data_property(i);
+            self.data_property(new_parent.clone(), i);
         }
     }
 
-    pub fn individual_vec(&mut self, e: &Vec<Individual<A>>) {
-        self.0.visit_individual_vec(e);
+    pub fn individual_vec(&mut self, parent: Option<Kind<B>>, e: &Vec<Individual<A>>) {
+        let new_parent = self.0.visit_individual_vec(parent, e);
         for i in e.iter() {
-            self.individual(i);
+            self.individual(new_parent.clone(), i);
         }
     }
 
-    pub fn literal_vec(&mut self, e: &Vec<Literal<A>>) {
-        self.0.visit_literal_vec(e);
+    pub fn literal_vec(&mut self, parent: Option<Kind<B>>, e: &Vec<Literal<A>>) {
+        let new_parent = self.0.visit_literal_vec(parent, e);
         for i in e.iter() {
-            self.literal(i);
+            self.literal(new_parent.clone(), i);
         }
     }
 
-    pub fn facet_restriction_vec(&mut self, e: &Vec<FacetRestriction<A>>) {
-        self.0.visit_facet_restriction_vec(e);
+    pub fn facet_restriction_vec(&mut self, parent: Option<Kind<B>>, e: &Vec<FacetRestriction<A>>) {
+        let new_parent = self.0.visit_facet_restriction_vec(parent, e);
         for i in e.iter() {
-            self.facet_restriction(i);
+            self.facet_restriction(new_parent.clone(), i);
         }
     }
 
-    pub fn data_range_vec(&mut self, e: &Vec<DataRange<A>>) {
-        self.0.visit_data_range_vec(e);
+    pub fn data_range_vec(&mut self, parent: Option<Kind<B>>, e: &Vec<DataRange<A>>) {
+        let new_parent = self.0.visit_data_range_vec(parent, e);
         for i in e.iter() {
-            self.data_range(i);
+            self.data_range(new_parent.clone(), i);
         }
     }
 
-    pub fn atom_vec(&mut self, v: &Vec<Atom<A>>) {
-        self.0.visit_atom_vec(v);
+    pub fn atom_vec(&mut self, parent: Option<Kind<B>>, v: &Vec<Atom<A>>) {
+        let new_parent = self.0.visit_atom_vec(parent, v);
         for i in v.iter() {
-            self.atom(i);
+            self.atom(new_parent.clone(), i);
         }
     }
 
-    pub fn darg_vec(&mut self, v: &Vec<DArgument<A>>) {
-        self.0.visit_darg_vec(v);
+    pub fn darg_vec(&mut self, parent: Option<Kind<B>>, v: &Vec<DArgument<A>>) {
+        let new_parent = self.0.visit_darg_vec(parent, v);
         for i in v.iter() {
-            self.darg(i);
-        }
-    }
-}
-
-pub mod entity {
-    use super::Visit;
-    use horned_owl::model::AnonymousIndividual;
-    use horned_owl::model::ForIRI;
-    use horned_owl::model::IRI;
-
-    pub struct IRIExtract<A>(Vec<IRI<A>>);
-
-    impl<A> Default for IRIExtract<A> {
-        fn default() -> Self {
-            IRIExtract(vec![])
-        }
-    }
-
-    impl<A> IRIExtract<A> {
-        pub fn as_mut_vec(&mut self) -> &mut Vec<IRI<A>> {
-            &mut self.0
-        }
-
-        pub fn into_vec(self) -> Vec<IRI<A>> {
-            self.0
-        }
-    }
-
-    impl<A: ForIRI> Visit<A> for IRIExtract<A> {
-        fn visit_iri(&mut self, iri: &IRI<A>) -> Option<()> {
-            self.0.push(iri.clone());
-            None
-        }
-    }
-
-    pub struct EntityExtract<A>(Vec<A>);
-
-    impl<A> Default for EntityExtract<A> {
-        fn default() -> Self {
-            EntityExtract(vec![])
-        }
-    }
-
-    impl<A> EntityExtract<A> {
-        pub fn as_mut_vec(&mut self) -> &mut Vec<A> {
-            &mut self.0
-        }
-
-        pub fn into_vec(self) -> Vec<A> {
-            self.0
-        }
-    }
-
-    impl<A: ForIRI> Visit<A> for EntityExtract<A> {
-        fn visit_iri(&mut self, iri: &IRI<A>) -> Option<()> {
-            self.0.push(iri.underlying());
-            None
-        }
-
-        fn visit_anonymous_individual(&mut self, anon: &AnonymousIndividual<A>) -> Option<()> {
-            self.0.push(anon.underlying());
-            None
+            self.darg(new_parent.clone(), i);
         }
     }
 }
